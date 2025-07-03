@@ -131,8 +131,8 @@ export default function BookingPage() {
       emergencyContactName: "",
       emergencyContactPhone: "",
       emergencyContactRelation: "",
-      agreeToTerms: false,
-      agreeToPrivacy: false,
+      agreeToTerms: true,
+      agreeToPrivacy: true,
     },
   });
 
@@ -287,24 +287,8 @@ export default function BookingPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12 px-4">
+      <div className=" bg-gradient-to-br from-blue-50 to-green-50 py-12 px-4">
         <div className="container mx-auto">
-          <div className="flex justify-center mb-8">
-            <Link href="/" className="flex items-center space-x-2 group">
-              <img
-                src="/images/logo2.jpg"
-                alt="Reflex Physiotherapy Logo"
-                className="w-12 h-12 object-cover rounded-md"
-              />
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">Reflex</h1>
-                <p className="text-xs text-gray-600">
-                  Physiotherapy & Rehab Center
-                </p>
-              </div>
-            </Link>
-          </div>
-
           {step < 4 && renderStepIndicator()}
           {renderStepTitle()}
           {renderStepDescription()}

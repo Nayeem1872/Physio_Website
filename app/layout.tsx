@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   description: "Reflex Physiotherapy",
   generator: "Reflex Physiotherapy",
   icons: {
-    icon: "/images/ico.jpg", // /public/favicon.png
-    shortcut: "/images/ico.jpg", // /public/favicon-16x16.png
-    apple: "/images/ico.jpg", // /public/apple-touch-icon.png
+    icon: "/images/logo2.jpg", // /public/favlogo4n.jpg
+    shortcut: "/images/logo2.jpg", // /public/favlogo4n-16x16.jpg
+    apple: "/images/logo2.jpg", // /public/apple-touch-icon.jpg
   },
 };
 

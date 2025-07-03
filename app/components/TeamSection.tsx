@@ -116,7 +116,7 @@ const TeamSection = () => {
                       >
                         {member.experience}
                       </Badge>
-                      <motion.div
+                      {/* <motion.div
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -127,7 +127,7 @@ const TeamSection = () => {
                         >
                           View Profile
                         </Button>
-                      </motion.div>
+                      </motion.div> */}
                     </div>
                   </CardContent>
                 </Card>

@@ -5,6 +5,12 @@ import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
+  const linkPaths: { [key: string]: string } = {
+    "About Us": "/about",
+    "Our Team": "/team",
+    Services: "/services",
+    Contact: "/book",
+  };
   return (
     <div>
       <footer className="bg-gray-900 text-white py-12">
@@ -22,7 +28,7 @@ const Footer = () => {
                 whileHover={{ scale: 1.05 }}
               >
                 <img
-                  src="/images/logo.jpg"
+                  src="/images/logo4.png"
                   alt="Reflex Physiotherapy Logo"
                   className="w-12 h-12 object-cover rounded-md"
                 />
@@ -66,16 +72,21 @@ const Footer = () => {
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
-                {["About Us", "Our Team", "Services", "Contact"].map((link) => (
-                  <motion.li key={link} whileHover={{ x: 5, color: "#60A5FA" }}>
-                    <Link
-                      href="#"
-                      className="hover:text-blue-400 transition-colors"
+                {["About Us", "Our Team", "Services", "Contact"].map(
+                  (linkText) => (
+                    <motion.li
+                      key={linkText}
+                      whileHover={{ x: 5, color: "#60A5FA" }}
                     >
-                      {link}
-                    </Link>
-                  </motion.li>
-                ))}
+                      <Link
+                        href={linkPaths[linkText] || "#"} // Look up the path, provide a fallback
+                        className="hover:text-blue-400 transition-colors"
+                      >
+                        {linkText}
+                      </Link>
+                    </motion.li>
+                  )
+                )}
               </ul>
             </div>
 

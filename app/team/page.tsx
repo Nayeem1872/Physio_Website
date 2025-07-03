@@ -306,7 +306,10 @@ export default function TeamPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
             >
-              <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+              <Badge
+                variant="outline"
+                className="bg-[#2e3192]/10 text-[#2e3192] mb-4"
+              >
                 <Users className="h-3 w-3 mr-1" />
                 Our Expert Team
               </Badge>

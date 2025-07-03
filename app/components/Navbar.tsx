@@ -55,7 +55,7 @@ const Navbar = () => {
             <motion.div whileHover={{ scale: 1.05 }}>
               <Link href="/" className="flex items-center space-x-3">
                 <img
-                  src="/images/logo2.jpg"
+                  src="/images/logo4.png"
                   alt="Reflex Physiotherapy Logo"
                   className="w-12 h-12 object-cover rounded-full"
                 />
