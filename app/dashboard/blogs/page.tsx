@@ -13,6 +13,8 @@ import {
   User,
   X,
   Image as ImageIcon,
+  FileText,
+  Tag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -32,8 +34,11 @@ interface BlogPost {
 export default function BlogsManagementPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"categories" | "posts">("posts");
   const [showForm, setShowForm] = useState(false);
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -45,6 +50,8 @@ export default function BlogsManagementPage() {
     readTime: "",
     author: "",
   });
+
+  const [categoryName, setCategoryName] = useState("");
 
   const [blogs, setBlogs] = useState<BlogPost[]>([
     {
@@ -75,14 +82,14 @@ export default function BlogsManagementPage() {
     },
   ]);
 
-  const categories = [
+  const [categories, setCategories] = useState<string[]>([
     "Wellness",
     "Sports Medicine",
     "Prevention",
     "Pain Management",
     "Senior Care",
     "Rehabilitation",
-  ];
+  ]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -193,6 +200,55 @@ export default function BlogsManagementPage() {
     });
   };
 
+  const handleCategorySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingCategory) {
+      // Update category
+      setCategories(
+        categories.map((cat) => (cat === editingCategory ? categoryName : cat))
+      );
+      // Update blogs with old category name
+      setBlogs(
+        blogs.map((blog) =>
+          blog.category === editingCategory
+            ? { ...blog, category: categoryName }
+            : blog
+        )
+      );
+    } else {
+      // Add new category
+      setCategories([...categories, categoryName]);
+    }
+    setCategoryName("");
+    setShowCategoryForm(false);
+    setEditingCategory(null);
+  };
+
+  const handleEditCategory = (category: string) => {
+    setEditingCategory(category);
+    setCategoryName(category);
+    setShowCategoryForm(true);
+  };
+
+  const handleDeleteCategory = (category: string) => {
+    const blogsInCategory = blogs.filter((blog) => blog.category === category);
+    if (blogsInCategory.length > 0) {
+      alert(
+        `Cannot delete category "${category}" because it has ${blogsInCategory.length} blog post(s). Please reassign or delete those posts first.`
+      );
+      return;
+    }
+    if (confirm(`Are you sure you want to delete the category "${category}"?`)) {
+      setCategories(categories.filter((cat) => cat !== category));
+    }
+  };
+
+  const handleCancelCategory = () => {
+    setShowCategoryForm(false);
+    setEditingCategory(null);
+    setCategoryName("");
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Desktop Sidebar */}
@@ -231,16 +287,120 @@ export default function BlogsManagementPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Blog Management
               </h1>
-              <p className="text-gray-600">Create and manage your blog posts</p>
+              <p className="text-gray-600">
+                {activeTab === "categories"
+                  ? "Manage blog categories"
+                  : "Create and manage your blog posts"}
+              </p>
             </div>
             <Button
-              onClick={() => setShowForm(true)}
+              onClick={() =>
+                activeTab === "categories"
+                  ? setShowCategoryForm(true)
+                  : setShowForm(true)
+              }
               className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#2e3192]/90 hover:to-[#4c46a3]/90"
             >
               <Plus className="h-5 w-5 mr-2" />
-              New Blog Post
+              {activeTab === "categories" ? "New Category" : "New Blog Post"}
             </Button>
           </div>
+
+          {/* Tabs */}
+          <div className="mb-8">
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8">
+                <button
+                  onClick={() => setActiveTab("categories")}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === "categories"
+                      ? "border-[#2e3192] text-[#2e3192]"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  <Tag className="h-5 w-5 inline-block mr-2" />
+                  Blog Categories
+                </button>
+                <button
+                  onClick={() => setActiveTab("posts")}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === "posts"
+                      ? "border-[#2e3192] text-[#2e3192]"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  <FileText className="h-5 w-5 inline-block mr-2" />
+                  Blog Posts
+                </button>
+              </nav>
+            </div>
+          </div>
+
+          {/* Category Form Modal */}
+          <AnimatePresence>
+            {showCategoryForm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+                onClick={handleCancelCategory}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+                >
+                  <div className="border-b border-gray-200 p-6 flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {editingCategory ? "Edit Category" : "Create New Category"}
+                    </h2>
+                    <button
+                      onClick={handleCancelCategory}
+                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <X className="h-6 w-6 text-gray-600" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleCategorySubmit} className="p-6 space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Category Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={categoryName}
+                        onChange={(e) => setCategoryName(e.target.value)}
+                        required
+                        placeholder="Enter category name"
+                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2e3192] focus:outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#2e3192]/90 hover:to-[#4c46a3]/90"
+                      >
+                        {editingCategory ? "Update Category" : "Create Category"}
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleCancelCategory}
+                        variant="outline"
+                        className="px-8"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Blog Form Modal */}
           <AnimatePresence>
@@ -437,9 +597,86 @@ export default function BlogsManagementPage() {
             )}
           </AnimatePresence>
 
-          {/* Blog Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blogs.map((blog, index) => (
+          {/* Categories Tab Content */}
+          {activeTab === "categories" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {categories.map((category, index) => {
+                const blogCount = blogs.filter(
+                  (blog) => blog.category === category
+                ).length;
+                return (
+                  <motion.div
+                    key={category}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-lg transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-gradient-to-r from-[#2e3192]/10 to-[#4c46a3]/10 rounded-lg">
+                          <Tag className="h-5 w-5 text-[#2e3192]" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {category}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {blogCount} {blogCount === 1 ? "post" : "posts"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleEditCategory(category)}
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:bg-red-50"
+                        onClick={() => handleDeleteCategory(category)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                );
+              })}
+
+              {categories.length === 0 && (
+                <div className="col-span-full text-center py-20">
+                  <Tag className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    No categories yet
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Create your first category to organize your blog posts
+                  </p>
+                  <Button
+                    onClick={() => setShowCategoryForm(true)}
+                    className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3]"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create Category
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Blog Posts Tab Content */}
+          {activeTab === "posts" && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {blogs.map((blog, index) => (
               <motion.div
                 key={blog.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -527,26 +764,28 @@ export default function BlogsManagementPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+              </div>
 
-          {/* Empty State */}
-          {blogs.length === 0 && (
-            <div className="text-center py-20">
-              <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No blog posts yet
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Create your first blog post to get started
-              </p>
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3]"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Create Blog Post
-              </Button>
-            </div>
+              {/* Empty State */}
+              {blogs.length === 0 && (
+                <div className="col-span-full text-center py-20">
+                  <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    No blog posts yet
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Create your first blog post to get started
+                  </p>
+                  <Button
+                    onClick={() => setShowForm(true)}
+                    className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3]"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create Blog Post
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>
