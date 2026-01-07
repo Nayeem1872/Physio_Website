@@ -4,6 +4,7 @@ import HeroSection from "./components/HeroSection";
 import ServiceSection from "./components/ServiceSection";
 import AboutSection from "./components/AboutSection";
 import TeamSection from "./components/TeamSection";
+import TestimonialSection from "./components/TestimonialSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 
@@ -24,6 +25,9 @@ export default function ReflexPhysiotherapyWebsite() {
 
       {/* Team Section */}
       <TeamSection />
+
+      {/* Testimonials Section */}
+      <TestimonialSection />
 
       {/* Contact Section */}
       <ContactSection />

@@ -9,11 +9,40 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Store token and user data in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      setError(err.message || "An error occurred during login");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -104,6 +133,17 @@ export default function LoginPage() {
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+
             {/* Email Field */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -197,28 +237,15 @@ export default function LoginPage() {
             >
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#2e3192]/90 hover:to-[#4c46a3]/90 text-white py-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#2e3192]/90 hover:to-[#4c46a3]/90 text-white py-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </motion.div>
           </form>
 
-          {/* Sign Up Link */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="text-center mt-8 text-gray-600"
-          >
-            Don't have an account?{" "}
-            <Link
-              href="/signup"
-              className="text-[#2e3192] hover:text-[#4c46a3] font-semibold transition-colors"
-            >
-              Sign Up
-            </Link>
-          </motion.p>
+
         </motion.div>
       </motion.div>
     </div>
