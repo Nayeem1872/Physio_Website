@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Bell, Search, User, LogOut, Settings, Menu } from "lucide-react";
+import { Bell, Search, User as UserIcon, LogOut, Settings, Menu } from "lucide-react";
+import { getUserInfoAPI, User } from "../api/authApi";
 
 interface DashboardNavbarProps {
   onMenuClick: () => void;
@@ -11,6 +12,34 @@ interface DashboardNavbarProps {
 export default function DashboardNavbar({ onMenuClick }: DashboardNavbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
+  const fetchUserInfo = async () => {
+    try {
+      const userData = await getUserInfoAPI();
+      setUser(userData);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   const notifications = [
     { id: 1, text: "New appointment booked", time: "5 min ago" },
@@ -102,10 +131,12 @@ export default function DashboardNavbar({ onMenuClick }: DashboardNavbarProps) {
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#2e3192] to-[#4c46a3] flex items-center justify-center text-white font-semibold">
-                  A
+                  {user ? getInitials(user.name) : "U"}
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-gray-900">Admin</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {user?.name || "Loading..."}
+                  </p>
                   <p className="text-xs text-gray-500">Administrator</p>
                 </div>
               </motion.button>
@@ -119,13 +150,17 @@ export default function DashboardNavbar({ onMenuClick }: DashboardNavbarProps) {
                     className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden"
                   >
                     <div className="p-4 border-b border-gray-200">
-                      <p className="font-semibold text-gray-900">Admin User</p>
-                      <p className="text-sm text-gray-500">admin@reflex.com</p>
+                      <p className="font-semibold text-gray-900">
+                        {user?.name || "User"}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {user?.email || "email@example.com"}
+                      </p>
                     </div>
                     <div className="p-2">
                       <Link href="/dashboard/profile">
                         <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left">
-                          <User className="h-4 w-4 text-gray-600" />
+                          <UserIcon className="h-4 w-4 text-gray-600" />
                           <span className="text-sm text-gray-700">Profile</span>
                         </button>
                       </Link>
@@ -139,12 +174,13 @@ export default function DashboardNavbar({ onMenuClick }: DashboardNavbarProps) {
                       </Link>
                     </div>
                     <div className="p-2 border-t border-gray-200">
-                      <Link href="/login">
-                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors text-left text-red-600">
-                          <LogOut className="h-4 w-4" />
-                          <span className="text-sm font-medium">Logout</span>
-                        </button>
-                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors text-left text-red-600"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span className="text-sm font-medium">Logout</span>
+                      </button>
                     </div>
                   </motion.div>
                 )}

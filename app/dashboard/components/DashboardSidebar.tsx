@@ -14,6 +14,7 @@ import {
   ChevronRight,
   HelpCircle,
   LogOut,
+  Calendar,
 } from "lucide-react";
 
 interface DashboardSidebarProps {
@@ -26,6 +27,11 @@ const menuItems = [
     name: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    name: "Appointments",
+    href: "/dashboard/appointments",
+    icon: Calendar,
   },
   {
     name: "Services",

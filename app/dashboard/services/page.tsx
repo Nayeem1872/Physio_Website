@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
@@ -14,74 +14,124 @@ import {
   CheckCircle,
   Folder,
   Briefcase,
+  Tag,
+  List,
+  AlertTriangle,
 } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
+import ServiceCategoriesList from "./components/ServiceCategoriesList";
+import ServiceCategoryForm from "./components/ServiceCategoryForm";
+import {
+  getAllServicesAPI,
+  createServiceAPI,
+  updateServiceAPI,
+  deleteServiceAPI,
+  CreateServicePayload,
+} from "./api/servicesApi";
+import { getAllServiceCategoriesAPI } from "./components/ServiceCategoriesList";
+
+interface ServiceCategory {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface Service {
-  id: string;
-  category: string;
+  _id: string;
+  category: string | { _id: string; name: string; slug: string; description: string; icon: string };
   name: string;
-  description: string;
+  slug: string;
+  shortDescription: string;
   detailedDescription: string;
-  benefits: string[];
+  keyBenefits: string[];
   duration: string;
   pricing: string;
+  imageUrl?: string;
+  published: boolean;
 }
 
 export default function ServicesPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"categories" | "services">("categories");
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [editingCategory, setEditingCategory] = useState<ServiceCategory | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [refreshCategoriesTrigger, setRefreshCategoriesTrigger] = useState(0);
+  const [services, setServices] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingService, setDeletingService] = useState<Service | null>(null);
 
-  // Sample data
-  const [services, setServices] = useState<Service[]>([
-    {
-      id: "1",
-      category: "Manual Therapy",
-      name: "Manual Therapy",
-      description:
-        "Hands-on approach using joint mobilization, soft tissue work, and massage techniques.",
-      detailedDescription:
-        "Manual therapy is a hands-on approach used by physical therapists to address musculoskeletal pain and improve function. It involves a variety of skilled movements, including joint mobilization, soft tissue work, and massage, to target specific areas and address underlying issues. The goal is to reduce pain, improve range of motion, and enhance overall mobility.",
-      benefits: [
-        "Reduced pain and inflammation",
-        "Improved range of motion",
-        "Enhanced mobility",
-        "Better circulation",
-        "Muscle tension relief",
-      ],
-      duration: "45-60 minutes",
-      pricing: "Contact for pricing",
-    },
-  ]);
-
-  const [formData, setFormData] = useState<Omit<Service, "id">>({
+  const [formData, setFormData] = useState<Partial<Omit<Service, 'category'> & { category: string }>>({
     category: "",
     name: "",
-    description: "",
+    slug: "",
+    shortDescription: "",
     detailedDescription: "",
-    benefits: [],
+    keyBenefits: [],
     duration: "",
     pricing: "",
+    imageUrl: "",
+    published: true,
   });
 
   const [benefitInput, setBenefitInput] = useState("");
 
-  // Get unique categories
-  const categories = ["All", ...Array.from(new Set(services.map((s) => s.category)))];
+  // Fetch services and categories on mount
+  useEffect(() => {
+    fetchServices();
+    fetchCategories();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getAllServicesAPI(undefined, true);
+      setServices(response.services);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      toast.error("Failed to fetch services");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await getAllServiceCategoriesAPI();
+      setCategories(response.categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  // Get category names for filter
+  const categoryNames = ["All", ...categories.map((c) => c.name)];
 
   // Filter services by category
   const filteredServices =
     selectedCategory === "All"
       ? services
-      : services.filter((s) => s.category === selectedCategory);
+      : services.filter((s) => {
+          // Handle both populated and non-populated category
+          const categoryId = typeof s.category === 'object' ? s.category._id : s.category;
+          const category = categories.find((c) => c._id === categoryId);
+          return category?.name === selectedCategory;
+        });
 
   const addBenefit = () => {
     if (benefitInput.trim()) {
       setFormData({
         ...formData,
-        benefits: [...formData.benefits, benefitInput.trim()],
+        keyBenefits: [...(formData.keyBenefits || []), benefitInput.trim()],
       });
       setBenefitInput("");
     }
@@ -90,63 +140,130 @@ export default function ServicesPage() {
   const removeBenefit = (index: number) => {
     setFormData({
       ...formData,
-      benefits: formData.benefits.filter((_, i) => i !== index),
+      keyBenefits: (formData.keyBenefits || []).filter((_, i) => i !== index),
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (editingService) {
-      // Update existing service
-      setServices(
-        services.map((service) =>
-          service.id === editingService.id
-            ? { ...formData, id: editingService.id }
-            : service
-        )
-      );
-    } else {
-      // Add new service
-      const newService: Service = {
-        ...formData,
-        id: Date.now().toString(),
-      };
-      setServices([...services, newService]);
-    }
+    const submitToast = toast.loading(
+      editingService ? "Updating service..." : "Creating service..."
+    );
 
-    resetForm();
+    try {
+      const payload: CreateServicePayload = {
+        category: formData.category!,
+        name: formData.name!,
+        slug: formData.slug || generateSlug(formData.name!),
+        shortDescription: formData.shortDescription!,
+        detailedDescription: formData.detailedDescription!,
+        keyBenefits: formData.keyBenefits || [],
+        duration: formData.duration!,
+        pricing: formData.pricing!,
+        imageUrl: formData.imageUrl,
+        published: formData.published ?? true,
+      };
+
+      if (editingService) {
+        await updateServiceAPI(editingService._id, payload);
+        toast.success("Service updated successfully!", { id: submitToast });
+      } else {
+        await createServiceAPI(payload);
+        toast.success("Service created successfully!", { id: submitToast });
+      }
+
+      await fetchServices();
+      resetForm();
+    } catch (error: any) {
+      console.error("Error submitting service:", error);
+      toast.error(error.message || "Failed to submit service", {
+        id: submitToast,
+      });
+    }
   };
 
   const resetForm = () => {
     setFormData({
       category: "",
       name: "",
-      description: "",
+      slug: "",
+      shortDescription: "",
       detailedDescription: "",
-      benefits: [],
+      keyBenefits: [],
       duration: "",
       pricing: "",
+      imageUrl: "",
+      published: true,
     });
     setBenefitInput("");
     setIsFormOpen(false);
     setEditingService(null);
   };
 
-  const handleEdit = (service: Service) => {
+  const handleEdit = (service: any) => {
+    // Handle both populated and non-populated category field
+    const categoryId = typeof service.category === 'object' 
+      ? service.category._id 
+      : service.category;
+    
     setEditingService(service);
-    setFormData(service);
+    setFormData({
+      ...service,
+      category: categoryId,
+    });
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this service?")) {
-      setServices(services.filter((service) => service.id !== id));
+  const handleDeleteClick = (service: Service) => {
+    setDeletingService(service);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingService) return;
+
+    const deleteToast = toast.loading("Deleting service...");
+
+    try {
+      await deleteServiceAPI(deletingService._id);
+      toast.success("Service deleted successfully!", { id: deleteToast });
+      await fetchServices();
+      setShowDeleteModal(false);
+      setDeletingService(null);
+    } catch (error: any) {
+      console.error("Error deleting service:", error);
+      toast.error(error.message || "Failed to delete service", {
+        id: deleteToast,
+      });
     }
+  };
+
+  const handleEditCategory = (category: ServiceCategory) => {
+    setEditingCategory(category);
+    setIsCategoryFormOpen(true);
+  };
+
+  const handleCategorySuccess = () => {
+    setRefreshCategoriesTrigger((prev) => prev + 1);
+    fetchCategories();
+  };
+
+  const handleCloseCategoryForm = () => {
+    setIsCategoryFormOpen(false);
+    setEditingCategory(null);
   };
 
   return (
     <div className="flex h-screen bg-gray-50">
+      <Toaster position="top-right" />
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <DashboardSidebar
@@ -194,141 +311,205 @@ export default function ServicesPage() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setIsFormOpen(true)}
+              onClick={() =>
+                activeTab === "categories"
+                  ? setIsCategoryFormOpen(true)
+                  : setIsFormOpen(true)
+              }
               className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
               <Plus className="h-5 w-5" />
-              Add Service
+              {activeTab === "categories" ? "Add Category" : "Add Service"}
             </motion.button>
           </motion.div>
 
-          {/* Category Filter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-6"
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              {categories.map((category) => (
+          {/* Tabs */}
+          <div className="mb-8">
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8">
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    selectedCategory === category
-                      ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
-                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                  onClick={() => setActiveTab("categories")}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === "categories"
+                      ? "border-[#2e3192] text-[#2e3192]"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}
                 >
-                  {category}
+                  <Tag className="h-5 w-5 inline-block mr-2" />
+                  Service Categories
                 </button>
-              ))}
+                <button
+                  onClick={() => setActiveTab("services")}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === "services"
+                      ? "border-[#2e3192] text-[#2e3192]"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  <List className="h-5 w-5 inline-block mr-2" />
+                  Services
+                </button>
+              </nav>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredServices.map((service, index) => (
+          {/* Categories Tab Content */}
+          {activeTab === "categories" && (
+            <ServiceCategoriesList
+              onEdit={handleEditCategory}
+              refreshTrigger={refreshCategoriesTrigger}
+            />
+          )}
+
+          {/* Services Tab Content */}
+          {activeTab === "services" && (
+            <>
+              {/* Category Filter */}
               <motion.div
-                key={service.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
+                transition={{ delay: 0.1 }}
+                className="mb-6"
               >
-                {/* Service Header */}
-                <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] p-6 text-white">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <Briefcase className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Folder className="h-4 w-4" />
-                          <span className="text-sm opacity-90">
-                            {service.category}
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-bold">{service.name}</h3>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(service)}
-                        className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(service.id)}
-                        className="p-2 bg-white/20 hover:bg-red-500 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-sm opacity-90">{service.description}</p>
-                </div>
-
-                {/* Service Body */}
-                <div className="p-6">
-                  {/* Detailed Description */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                      About This Service
-                    </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {service.detailedDescription}
-                    </p>
-                  </div>
-
-                  {/* Benefits */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                      Key Benefits
-                    </h4>
-                    <div className="space-y-2">
-                      {service.benefits.map((benefit, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                          <span className="text-sm text-gray-700">
-                            {benefit}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Duration & Pricing */}
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                        <Clock className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Duration</p>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {service.duration}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                        <DollarSign className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Pricing</p>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {service.pricing}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {categoryNames.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                        selectedCategory === category
+                          ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
+                          : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
                 </div>
               </motion.div>
-            ))}
-          </div>
+
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-gray-500">Loading services...</div>
+                </div>
+              )}
+
+              {/* Services Grid */}
+              {!isLoading && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {filteredServices.map((service, index) => {
+                    // Handle both populated and non-populated category
+                    const categoryId = typeof service.category === 'object' 
+                      ? service.category._id 
+                      : service.category;
+                    const categoryName = typeof service.category === 'object'
+                      ? service.category.name
+                      : categories.find((c) => c._id === categoryId)?.name || "Uncategorized";
+                    
+                    return (
+                      <motion.div
+                        key={service._id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
+                      >
+                        {/* Service Header */}
+                        <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] p-6 text-white">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <Briefcase className="h-6 w-6" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Folder className="h-4 w-4" />
+                                  <span className="text-sm opacity-90">
+                                    {categoryName}
+                                  </span>
+                                </div>
+                                <h3 className="text-xl font-bold">{service.name}</h3>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleEdit(service)}
+                                className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(service)}
+                                className="p-2 bg-white/20 hover:bg-red-500 rounded-lg transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-sm opacity-90">{service.shortDescription}</p>
+                        </div>
+
+                        {/* Service Body */}
+                        <div className="p-6">
+                          {/* Detailed Description */}
+                          <div className="mb-6">
+                            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                              About This Service
+                            </h4>
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                              {service.detailedDescription}
+                            </p>
+                          </div>
+
+                          {/* Benefits */}
+                          <div className="mb-6">
+                            <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                              Key Benefits
+                            </h4>
+                            <div className="space-y-2">
+                              {service.keyBenefits.map((benefit, idx) => (
+                                <div key={idx} className="flex items-start gap-2">
+                                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                                  <span className="text-sm text-gray-700">
+                                    {benefit}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Duration & Pricing */}
+                          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                            <div className="flex items-center gap-2">
+                              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <Clock className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Duration</p>
+                                <p className="text-sm font-semibold text-gray-900">
+                                  {service.duration}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                <DollarSign className="h-5 w-5 text-green-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500">Pricing</p>
+                                <p className="text-sm font-semibold text-gray-900">
+                                  {service.pricing}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
 
           {/* Empty State */}
           {filteredServices.length === 0 && (
@@ -356,10 +537,68 @@ export default function ServicesPage() {
               )}
             </motion.div>
           )}
+            </>
+          )}
         </main>
       </div>
 
-      {/* Add/Edit Form Modal */}
+      {/* Service Category Form Modal */}
+      <ServiceCategoryForm
+        isOpen={isCategoryFormOpen}
+        onClose={handleCloseCategoryForm}
+        editingCategory={editingCategory}
+        onSuccess={handleCategorySuccess}
+      />
+
+      {/* Delete Service Confirmation Modal */}
+      {showDeleteModal && deletingService && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 bg-red-100 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Delete Service
+                </h3>
+                <p className="text-sm text-gray-600">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold">{deletingService.name}</span>?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeletingService(null);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Add/Edit Service Form Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <motion.div
@@ -386,16 +625,21 @@ export default function ServicesPage() {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Service Category *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     required
-                    value={formData.category}
+                    value={typeof formData.category === 'string' ? formData.category : ''}
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
-                    placeholder="Manual Therapy"
-                  />
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -422,9 +666,9 @@ export default function ServicesPage() {
                 <input
                   type="text"
                   required
-                  value={formData.description}
+                  value={formData.shortDescription}
                   onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
+                    setFormData({ ...formData, shortDescription: e.target.value })
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
                   placeholder="Hands-on approach using joint mobilization..."
@@ -461,7 +705,7 @@ export default function ServicesPage() {
                     type="text"
                     value={benefitInput}
                     onChange={(e) => setBenefitInput(e.target.value)}
-                    onKeyPress={(e) =>
+                    onKeyDown={(e) =>
                       e.key === "Enter" && (e.preventDefault(), addBenefit())
                     }
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
@@ -476,7 +720,7 @@ export default function ServicesPage() {
                   </button>
                 </div>
                 <div className="space-y-2">
-                  {formData.benefits.map((benefit, index) => (
+                  {(formData.keyBenefits || []).map((benefit, index) => (
                     <div
                       key={index}
                       className="flex items-center gap-2 p-3 bg-green-50 rounded-lg"

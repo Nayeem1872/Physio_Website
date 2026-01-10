@@ -35,6 +35,9 @@ export default function LoginPage() {
       // Store token and user data in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      
+      // Set flag for welcome toast
+      sessionStorage.setItem("justLoggedIn", "true");
 
       // Redirect to dashboard
       window.location.href = "/dashboard";
