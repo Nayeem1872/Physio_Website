@@ -1,16 +1,28 @@
+"use client";
 import React from "react";
 import { motion } from "framer-motion";
-import { Activity } from "lucide-react";
 import Link from "next/link";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
+import { useContactInfo } from "../hooks/useContactInfo";
 
 const Footer = () => {
+  const { contactInfo } = useContactInfo();
+
   const linkPaths: { [key: string]: string } = {
     "About Us": "/about",
     "Our Team": "/team",
     Services: "/services",
     Contact: "/book",
   };
+
+  const socialLinks = [
+    { name: "Facebook", icon: Facebook, url: contactInfo?.facebook },
+    { name: "Instagram", icon: Instagram, url: contactInfo?.instagram },
+    { name: "Twitter", icon: Twitter, url: contactInfo?.twitter },
+    { name: "LinkedIn", icon: Linkedin, url: contactInfo?.linkedin },
+    { name: "YouTube", icon: Youtube, url: contactInfo?.youtube },
+  ].filter((link) => link.url);
+
   return (
     <div>
       <footer className="bg-gray-900 text-white py-12">
@@ -43,6 +55,27 @@ const Footer = () => {
                 Your trusted partner in recovery and rehabilitation. Helping you
                 move better and live healthier.
               </p>
+              
+              {/* Social Media Links */}
+              {socialLinks.length > 0 && (
+                <div className="flex items-center gap-3 pt-2">
+                  {socialLinks.map((social) => {
+                    const Icon = social.icon;
+                    return (
+                      <motion.a
+                        key={social.name}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1, y: -2 }}
+                        className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                      >
+                        <Icon className="h-4 w-4" />
+                      </motion.a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div>
@@ -79,7 +112,7 @@ const Footer = () => {
                       whileHover={{ x: 5, color: "#60A5FA" }}
                     >
                       <Link
-                        href={linkPaths[linkText] || "#"} // Look up the path, provide a fallback
+                        href={linkPaths[linkText] || "#"}
                         className="hover:text-blue-400 transition-colors"
                       >
                         {linkText}
@@ -93,18 +126,48 @@ const Footer = () => {
             <div>
               <h4 className="font-semibold mb-4">Contact Info</h4>
               <div className="space-y-3 text-gray-400">
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4" />
-                  <span>01684522924</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
-                  <span>physiomaksudur24@gmail.com</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>House#17, Road#05, Sector#12, Level#05, Uttara</span>
-                </div>
+                {contactInfo?.phone && contactInfo.phone.length > 0 && (
+                  <div className="space-y-2">
+                    {contactInfo.phone.map((phone, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <Phone className="h-4 w-4 flex-shrink-0" />
+                        <a
+                          href={`tel:${phone}`}
+                          className="hover:text-blue-400 transition-colors"
+                        >
+                          {phone}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {contactInfo?.email && contactInfo.email.length > 0 && (
+                  <div className="space-y-2">
+                    {contactInfo.email.map((email, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <Mail className="h-4 w-4 flex-shrink-0" />
+                        <a
+                          href={`mailto:${email}`}
+                          className="hover:text-blue-400 transition-colors break-all"
+                        >
+                          {email}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {contactInfo?.address && contactInfo.address.length > 0 && (
+                  <div className="space-y-2">
+                    {contactInfo.address.map((addr, index) => (
+                      <div key={index} className="flex items-start space-x-2">
+                        <MapPin className="h-4 w-4 flex-shrink-0 mt-1" />
+                        <span className="text-sm">{addr}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

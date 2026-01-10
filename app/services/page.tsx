@@ -34,10 +34,15 @@ import {
   Stethoscope,
   Baby,
   UserCheck,
+  Loader2,
+  Hand,
 } from "lucide-react";
 import Link from "next/link";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import { useServices } from "../hooks/useServices";
+import { useContactInfo } from "../hooks/useContactInfo";
+import { useState, useMemo } from "react";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -59,179 +64,50 @@ const scaleOnHover = {
 };
 
 export default function ServicesPage() {
-  const serviceCategories = [
-    {
-      id: "manual",
-      name: "Manual & Sports Therapy",
-      icon: Target,
-      description: "Hands-on treatment and sports rehabilitation",
-    },
-    {
-      id: "specialized",
-      name: "Specialized Care",
-      icon: Stethoscope,
-      description: "Age-specific and condition-focused treatments",
-    },
-    {
-      id: "advanced",
-      name: "Advanced Techniques",
-      icon: Zap,
-      description: "Modern therapeutic interventions",
-    },
-  ];
+  const { services, isLoading } = useServices();
+  const { contactInfo } = useContactInfo();
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  const services = {
-    manual: [
-      {
-        icon: Target,
-        title: "Manual Therapy",
-        description:
-          "Hands-on approach using joint mobilization, soft tissue work, and massage techniques.",
-        fullDescription:
-          "Manual therapy is a hands-on approach used by physical therapists to address musculoskeletal pain and improve function. It involves a variety of skilled movements, including joint mobilization, soft tissue work, and massage, to target specific areas and address underlying issues. The goal is to reduce pain, improve range of motion, and enhance overall mobility.",
-        duration: "45-60 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Reduced pain and inflammation",
-          "Improved range of motion",
-          "Enhanced mobility",
-          "Better circulation",
-          "Muscle tension relief",
-        ],
-        color: "from-[#2e3192] to-[#4c46a3]",
-      },
-      {
-        icon: Activity,
-        title: "Sports Rehabilitation",
-        description:
-          "Specialized therapy for musculoskeletal injuries using exercise and therapeutic interventions.",
-        fullDescription:
-          "Sports rehabilitation is a type of physical therapy that treats people of all ages who have musculoskeletal system pain, injury, or illness. With the use of exercise, movement, and therapeutic interventions, sports rehabilitation helps maintain health and fitness and helps you recover from injury and reduce pain.",
-        duration: "60-90 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Faster return to sport",
-          "Injury prevention strategies",
-          "Performance optimization",
-          "Sport-specific training",
-          "Biomechanical analysis",
-        ],
-        color: "from-green-500 to-green-600",
-      },
-      {
-        icon: Zap,
-        title: "Dry Needling",
-        description:
-          "Thin needles inserted into trigger points to relieve pain and improve movement.",
-        fullDescription:
-          "Dry needling is a physical therapy technique where thin needles are inserted into specific areas of the muscle, often where trigger points are located, to relieve pain and improve movement. It's a pain management and physical therapy tool used to address muscle tightness, pain, and movement restriction.",
-        duration: "30-45 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Pain relief",
-          "Muscle tension reduction",
-          "Improved movement",
-          "Trigger point release",
-          "Enhanced recovery",
-        ],
-        color: "from-red-500 to-red-600",
-      },
-    ],
-    specialized: [
-      {
-        icon: Shield,
-        title: "Post-Surgical Rehabilitation",
-        description:
-          "Structured program to regain strength, mobility, and function after surgery.",
-        fullDescription:
-          "Post-surgical rehabilitation is a crucial process that helps individuals regain strength, mobility, and function after surgery. It involves a structured program of exercises, therapies, and lifestyle adjustments designed to support healing and prevent complications. The goal is to restore physical function, reduce pain and swelling, and improve overall quality of life.",
-        duration: "45-75 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Accelerated healing",
-          "Reduced complications",
-          "Improved mobility",
-          "Pain management",
-          "Functional restoration",
-        ],
-        color: "from-purple-500 to-purple-600",
-      },
-      {
-        icon: Baby,
-        title: "Pediatric Physiotherapy",
-        description:
-          "Specialized care for children from birth to 19 years focusing on optimal development.",
-        fullDescription:
-          "Pediatric physiotherapy is a specialized area of physiotherapy that focuses on the assessment, treatment, and care of children from birth to 19 years of age. These therapists use their expertise in child development and conditions to help children achieve their optimal physical development and independence. They work with children experiencing movement issues, developmental delays, or injuries, often in collaboration with families and other healthcare professionals.",
-        duration: "30-45 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Improved motor development",
-          "Enhanced coordination",
-          "Better posture",
-          "Increased strength",
-          "Social skill development",
-        ],
-        color: "from-pink-500 to-pink-600",
-      },
-      {
-        icon: UserCheck,
-        title: "Geriatric Physiotherapy",
-        description:
-          "Specialized care for older adults addressing age-related conditions.",
-        fullDescription:
-          "Geriatric physiotherapy is a specialized area of physiotherapy that focuses on the unique physical needs and challenges faced by older adults. It aims to improve and maintain mobility, function, and quality of life for seniors, often addressing age-related conditions like joint pain, balance issues, and reduced strength.",
-        duration: "45-60 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Improved balance and stability",
-          "Fall prevention",
-          "Pain management",
-          "Enhanced mobility",
-          "Better quality of life",
-        ],
-        color: "from-orange-500 to-orange-600",
-      },
-    ],
-    advanced: [
-      {
-        icon: Zap,
-        title: "Dry Needling",
-        description:
-          "Thin needles inserted into trigger points to relieve pain and improve movement.",
-        fullDescription:
-          "Dry needling is a physical therapy technique where thin needles are inserted into specific areas of the muscle, often where trigger points are located, to relieve pain and improve movement. It's a pain management and physical therapy tool used to address muscle tightness, pain, and movement restriction.",
-        duration: "30-45 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Pain relief",
-          "Muscle tension reduction",
-          "Improved movement",
-          "Trigger point release",
-          "Enhanced recovery",
-        ],
-        color: "from-red-500 to-red-600",
-      },
-      {
-        icon: Zap,
-        title: "Electrotherapy",
-        description:
-          "Medical treatment using electrical currents to address various conditions.",
-        fullDescription:
-          "Electrotherapy is a form of medical treatment that uses electrical currents to address various conditions, primarily for pain management, muscle stimulation, and tissue healing. It's commonly used in physiotherapy to complement other treatment approaches.",
-        duration: "20-30 minutes",
-        price: "Contact for pricing",
-        benefits: [
-          "Pain reduction",
-          "Muscle stimulation",
-          "Improved circulation",
-          "Tissue healing",
-          "Reduced inflammation",
-        ],
-        color: "from-blue-500 to-blue-600",
-      },
-    ],
+  // Icon mapping
+  const iconMap: { [key: string]: any } = {
+    Activity,
+    Baby,
+    Shield,
+    Target,
+    UserCheck,
+    Zap,
+    Hand,
+    Stethoscope,
   };
+
+  // Color mapping
+  const colorMap: { [key: string]: string } = {
+    "Manual Therapy": "from-[#2e3192] to-[#4c46a3]",
+    "Sports Rehabilitation": "from-green-500 to-green-600",
+    "Post-Surgical Rehabilitation": "from-purple-500 to-purple-600",
+    "Pediatric Physiotherapy": "from-pink-500 to-pink-600",
+    "Geriatric Physiotherapy": "from-orange-500 to-orange-600",
+    "Dry Needling": "from-red-500 to-red-600",
+    "Electrotherapy": "from-blue-500 to-blue-600",
+  };
+
+  // Get unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(services.map((s) => s.category._id))
+    ).map((id) => {
+      const service = services.find((s) => s.category._id === id);
+      return service?.category;
+    }).filter(Boolean);
+
+    return uniqueCategories;
+  }, [services]);
+
+  // Filter services by category
+  const filteredServices = useMemo(() => {
+    if (activeCategory === "all") return services;
+    return services.filter((s) => s.category._id === activeCategory);
+  }, [services, activeCategory]);
 
   const faqs = [
     {
@@ -347,7 +223,7 @@ export default function ServicesPage() {
                   className="border-2 border-[#2e3192] text-[#2e3192] hover:bg-[#2e3192]/5 px-8 py-3 bg-transparent"
                 >
                   <Phone className="mr-2 h-4 w-4" />
-                  Call: 01684522924
+                  Call: {contactInfo?.phone[0] || "01684522924"}
                 </Button>
               </motion.div>
             </motion.div>
@@ -402,118 +278,135 @@ export default function ServicesPage() {
             </p>
           </motion.div>
 
-          <Tabs defaultValue="manual" className="w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="flex justify-center mb-12"
-            >
-              {/* Responsive TabsList */}
-              <TabsList className="grid w-full max-w-4xl grid-cols-1 sm:grid-cols-3 bg-gray-200 p-1.5 rounded-xl h-auto">
-                {serviceCategories.map((category) => (
-                  <TabsTrigger
-                    key={category.id}
-                    value={category.id}
-                    className="flex flex-row items-center justify-start sm:justify-center space-x-3 py-3 px-4 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#2e3192] rounded-lg transition-all duration-300"
-                  >
-                    <category.icon className="h-6 w-6 flex-shrink-0" />
-                    <div className="text-left sm:text-center">
-                      <div className="font-semibold">{category.name}</div>
-                      <div className="hidden sm:block text-xs opacity-70">
-                        {category.description}
-                      </div>
-                    </div>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </motion.div>
-
-            {serviceCategories.map((category) => (
-              <TabsContent
-                key={category.id}
-                value={category.id}
-                className="focus-visible:ring-0 focus-visible:ring-offset-0"
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 text-[#2e3192] animate-spin" />
+            </div>
+          ) : services.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">No services available at the moment.</p>
+            </div>
+          ) : (
+            <>
+              {/* Category Filter */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="flex justify-center mb-12"
               >
-                <motion.div
-                  variants={staggerContainer}
-                  initial="initial"
-                  whileInView="animate"
-                  viewport={{ once: true, amount: 0.2 }}
-                  className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
-                >
-                  {services[category.id as keyof typeof services].map(
-                    (service) => (
-                      <motion.div
-                        key={service.title}
-                        variants={fadeInUp}
-                        className="h-full"
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <button
+                    onClick={() => setActiveCategory("all")}
+                    className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                      activeCategory === "all"
+                        ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
+                        : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    All Services
+                  </button>
+                  {categories.map((category: any) => {
+                    const IconComponent = iconMap[category.icon] || Stethoscope;
+                    return (
+                      <button
+                        key={category._id}
+                        onClick={() => setActiveCategory(category._id)}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                          activeCategory === category._id
+                            ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
+                            : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                        }`}
                       >
-                        <Card className="h-full flex flex-col border-gray-200/80 shadow-md hover:shadow-xl hover:border-[#2e3192] transition-all duration-300 group">
-                          <CardHeader className="items-center text-center pb-4">
-                            <div
-                              className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform duration-300`}
-                            >
-                              <service.icon className="h-8 w-8" />
-                            </div>
-                            <CardTitle className="text-xl font-bold text-gray-800">
-                              {service.title}
-                            </CardTitle>
-                            <CardDescription className="text-gray-500 pt-1">
-                              {service.description}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="flex flex-col flex-grow space-y-4">
-                            <p className="text-sm text-gray-600 leading-relaxed flex-grow">
-                              {service.fullDescription}
-                            </p>
+                        <IconComponent className="h-5 w-5" />
+                        {category.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
 
-                            <div className="space-y-2 pt-2">
-                              <h4 className="font-semibold text-gray-800 text-sm">
-                                Key Benefits:
-                              </h4>
-                              <ul className="space-y-1.5">
-                                {service.benefits.map((benefit, i) => (
-                                  <li
-                                    key={i}
-                                    className="flex items-center space-x-2 text-sm text-gray-700"
-                                  >
-                                    <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                                    <span>{benefit}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
+              {/* Services Grid */}
+              <motion.div
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true, amount: 0.2 }}
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
+              >
+                {filteredServices.map((service) => {
+                  const IconComponent = iconMap[service.category.icon] || Activity;
+                  const colorClass =
+                    colorMap[service.category.name] || "from-[#2e3192] to-[#4c46a3]";
 
-                            <div className="border-t pt-4 mt-auto">
-                              <div className="flex justify-between items-center text-sm mb-4">
-                                <div className="flex items-center space-x-2 text-gray-600">
-                                  <Clock className="h-4 w-4 text-[#2e3192]" />
-                                  <span className="font-medium">
-                                    {service.duration}
-                                  </span>
-                                </div>
-                                <div className="text-lg font-bold text-[#2e3192]">
-                                  {service.price}
-                                </div>
+                  return (
+                    <motion.div
+                      key={service._id}
+                      variants={fadeInUp}
+                      className="h-full"
+                    >
+                      <Card className="h-full flex flex-col border-gray-200/80 shadow-md hover:shadow-xl hover:border-[#2e3192] transition-all duration-300 group">
+                        <CardHeader className="items-center text-center pb-4">
+                          <div
+                            className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${colorClass} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform duration-300`}
+                          >
+                            <IconComponent className="h-8 w-8" />
+                          </div>
+                          <CardTitle className="text-xl font-bold text-gray-800">
+                            {service.name}
+                          </CardTitle>
+                          <CardDescription className="text-gray-500 pt-1">
+                            {service.shortDescription}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col flex-grow space-y-4">
+                          <p className="text-sm text-gray-600 leading-relaxed flex-grow">
+                            {service.detailedDescription}
+                          </p>
+
+                          <div className="space-y-2 pt-2">
+                            <h4 className="font-semibold text-gray-800 text-sm">
+                              Key Benefits:
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {service.keyBenefits.map((benefit, i) => (
+                                <li
+                                  key={i}
+                                  className="flex items-center space-x-2 text-sm text-gray-700"
+                                >
+                                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                                  <span>{benefit}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="border-t pt-4 mt-auto">
+                            <div className="flex justify-between items-center text-sm mb-4">
+                              <div className="flex items-center space-x-2 text-gray-600">
+                                <Clock className="h-4 w-4 text-[#2e3192]" />
+                                <span className="font-medium">{service.duration}</span>
                               </div>
-                              <Link href="/book" className="w-full">
-                                <Button className="w-full bg-[#2e3192] hover:bg-[#252a7a]">
-                                  Book This Service
-                                  <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
-                              </Link>
+                              <div className="text-lg font-bold text-[#2e3192]">
+                                {service.pricing}
+                              </div>
                             </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    )
-                  )}
-                </motion.div>
-              </TabsContent>
-            ))}
-          </Tabs>
+                            <Link href="/book" className="w-full">
+                              <Button className="w-full bg-[#2e3192] hover:bg-[#252a7a]">
+                                Book This Service
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            </>
+          )}
         </div>
       </section>
 
@@ -696,7 +589,7 @@ export default function ServicesPage() {
                   className="border-2 border-white text-white hover:bg-white hover:text-[#2e3192] px-8 py-3 font-semibold bg-transparent"
                 >
                   <Phone className="mr-2 h-5 w-5" />
-                  Call 01684522924
+                  Call {contactInfo?.phone[0] || "01684522924"}
                 </Button>
               </motion.div>
             </motion.div>

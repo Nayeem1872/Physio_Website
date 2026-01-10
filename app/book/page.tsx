@@ -48,6 +48,7 @@ import { bookAppointment } from "./actions";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useContactInfo } from "../hooks/useContactInfo";
 
 const formSchema = z.object({
   firstName: z
@@ -108,6 +109,7 @@ export default function BookingPage() {
     success: boolean;
     message: string;
   } | null>(null);
+  const { contactInfo } = useContactInfo();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -1009,10 +1011,10 @@ export default function BookingPage() {
             <p>
               Need assistance? Call us at{" "}
               <a
-                href="tel:01684522924"
+                href={`tel:${contactInfo?.phone[0] || "01684522924"}`}
                 className="text-[#2e3192] font-semibold"
               >
-                01684522924
+                {contactInfo?.phone[0] || "01684522924"}
               </a>
             </p>
           </div>

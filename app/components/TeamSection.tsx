@@ -1,11 +1,48 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 
+interface TeamMember {
+  _id: string;
+  profileImage: string;
+  fullName: string;
+  title: string;
+  specialization: string;
+  experience: string;
+  education: string;
+  certifications: string[];
+  specialties: string[];
+  biography: string;
+  email: string;
+  phone: string;
+  availability: string;
+  languages: string[];
+}
+
 const TeamSection = () => {
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/team");
+        const data = await response.json();
+        setTeamMembers(data.teamMembers || []);
+      } catch (error) {
+        console.error("Error fetching team members:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeamMembers();
+  }, []);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
     animate: { opacity: 1, y: 0 },
@@ -19,6 +56,17 @@ const TeamSection = () => {
       },
     },
   };
+
+  if (loading) {
+    return (
+      <section id="team" className="py-20 bg-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-600">Loading team members...</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <div>
       <section id="team" className="py-20 bg-white">
@@ -53,28 +101,9 @@ const TeamSection = () => {
             viewport={{ once: true }}
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {[
-              {
-                name: "Dr. Maksudur Rahman",
-                role: "Lead Physiotherapist",
-                specialization: "Manual Therapy & Sports Rehabilitation",
-                experience: "Expert in Evidence-Based Practice",
-              },
-              {
-                name: "Dr. Farhan Ahmed",
-                role: "Pediatric Specialist",
-                specialization: "Child Development & Movement",
-                experience: "Pediatric Physiotherapy Expert",
-              },
-              {
-                name: "Dr. Rafiq Hassan",
-                role: "Geriatric Specialist",
-                specialization: "Elderly Care & Mobility",
-                experience: "Senior Care Specialist",
-              },
-            ].map((member, index) => (
+            {teamMembers.map((member) => (
               <motion.div
-                key={member.name}
+                key={member._id}
                 variants={fadeInUp}
                 whileHover={{ y: -10 }}
                 className="group"
@@ -86,8 +115,8 @@ const TeamSection = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <Image
-                        src={`/placeholder.svg?height=300&width=300`}
-                        alt={member.name}
+                        src={`http://localhost:5000${member.profileImage}`}
+                        alt={member.fullName}
                         width={300}
                         height={300}
                         className="w-full h-64 object-cover"
@@ -101,10 +130,10 @@ const TeamSection = () => {
                   </div>
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold text-gray-800 mb-2">
-                      {member.name}
+                      {member.fullName}
                     </h3>
                     <p className="text-[#2e3192] font-medium mb-2">
-                      {member.role}
+                      {member.title}
                     </p>
                     <p className="text-gray-600 text-sm mb-3">
                       {member.specialization}
@@ -116,18 +145,6 @@ const TeamSection = () => {
                       >
                         {member.experience}
                       </Badge>
-                      {/* <motion.div
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-[#2e3192] hover:text-[#2e3192]"
-                        >
-                          View Profile
-                        </Button>
-                      </motion.div> */}
                     </div>
                   </CardContent>
                 </Card>
