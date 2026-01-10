@@ -3,46 +3,35 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
-import {
-  Plus,
-  Quote,
-  CheckCircle,
-  Clock,
-  Star,
-} from "lucide-react";
+import { Plus, HelpCircle, CheckCircle, Clock, List } from "lucide-react";
 import { Toaster } from "react-hot-toast";
-import TestimonialsList, {
-  getAllTestimonialsAPI,
-} from "./components/TestimonialsList";
-import TestimonialForm from "./components/TestimonialForm";
+import FAQsList, { getAllFAQsAPI } from "./components/FAQsList";
+import FAQForm from "./components/FAQForm";
 
-interface Testimonial {
+interface FAQ {
   _id: string;
-  profileMedia: string;
-  mediaType: "image" | "video";
-  fullName: string;
-  role: string;
-  rating: number;
-  testimonial: string;
-  service: string;
-  date: string;
+  question: string;
+  answer: string;
+  category: string;
+  order: number;
   published: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export default function TestimonialsPage() {
+export default function FAQPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
+  const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
   const [filterStatus, setFilterStatus] = useState<"all" | "published" | "unpublished">("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
     published: 0,
     unpublished: 0,
-    avgRating: "0.0",
+    categories: [] as string[],
   });
 
   useEffect(() => {
@@ -51,30 +40,24 @@ export default function TestimonialsPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await getAllTestimonialsAPI(true);
-      const testimonials = response.testimonials;
-      const published = testimonials.filter((t) => t.published).length;
-      const avgRating =
-        testimonials.length > 0
-          ? (
-              testimonials.reduce((acc, t) => acc + t.rating, 0) /
-              testimonials.length
-            ).toFixed(1)
-          : "0.0";
+      const response = await getAllFAQsAPI(true);
+      const faqs = response.faqs;
+      const published = faqs.filter((f) => f.published).length;
+      const categories = Array.from(new Set(faqs.map((f) => f.category)));
 
       setStats({
-        total: testimonials.length,
+        total: faqs.length,
         published,
-        unpublished: testimonials.length - published,
-        avgRating,
+        unpublished: faqs.length - published,
+        categories,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
   };
 
-  const handleEdit = (testimonial: Testimonial) => {
-    setEditingTestimonial(testimonial);
+  const handleEdit = (faq: FAQ) => {
+    setEditingFAQ(faq);
     setIsFormOpen(true);
   };
 
@@ -84,7 +67,7 @@ export default function TestimonialsPage() {
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
-    setEditingTestimonial(null);
+    setEditingFAQ(null);
   };
 
   return (
@@ -128,10 +111,10 @@ export default function TestimonialsPage() {
           >
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Testimonials Management
+                FAQ Management
               </h1>
               <p className="text-gray-600">
-                Manage patient reviews and testimonials
+                Manage frequently asked questions
               </p>
             </div>
             <motion.button
@@ -141,7 +124,7 @@ export default function TestimonialsPage() {
               className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
               <Plus className="h-5 w-5" />
-              Add Testimonial
+              Add FAQ
             </motion.button>
           </motion.div>
 
@@ -159,7 +142,7 @@ export default function TestimonialsPage() {
                   <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <Quote className="h-6 w-6 text-blue-600" />
+                  <HelpCircle className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </motion.div>
@@ -206,23 +189,24 @@ export default function TestimonialsPage() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Avg Rating</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.avgRating}</p>
+                  <p className="text-sm text-gray-600 mb-1">Categories</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.categories.length}</p>
                 </div>
-                <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
-                  <Star className="h-6 w-6 text-yellow-600 fill-yellow-600" />
+                <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                  <List className="h-6 w-6 text-purple-600" />
                 </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Filter Buttons */}
+          {/* Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="mb-6"
+            className="mb-6 space-y-4"
           >
+            {/* Status Filter */}
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setFilterStatus("all")}
@@ -255,22 +239,53 @@ export default function TestimonialsPage() {
                 Pending ({stats.unpublished})
               </button>
             </div>
+
+            {/* Category Filter */}
+            {stats.categories.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-medium text-gray-700">Category:</span>
+                <button
+                  onClick={() => setCategoryFilter("all")}
+                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                    categoryFilter === "all"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  All
+                </button>
+                {stats.categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setCategoryFilter(category)}
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                      categoryFilter === category
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
-          {/* Testimonials List */}
-          <TestimonialsList
+          {/* FAQs List */}
+          <FAQsList
             onEdit={handleEdit}
             refreshTrigger={refreshTrigger}
             filterStatus={filterStatus}
+            categoryFilter={categoryFilter}
           />
         </main>
       </div>
 
       {/* Add/Edit Form Modal */}
-      <TestimonialForm
+      <FAQForm
         isOpen={isFormOpen}
         onClose={handleCloseForm}
-        editingTestimonial={editingTestimonial}
+        editingFAQ={editingFAQ}
         onSuccess={handleSuccess}
       />
     </div>

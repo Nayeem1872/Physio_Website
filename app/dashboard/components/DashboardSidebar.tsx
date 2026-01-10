@@ -12,6 +12,8 @@ import {
   Briefcase,
   ChevronLeft,
   ChevronRight,
+  HelpCircle,
+  LogOut,
 } from "lucide-react";
 
 interface DashboardSidebarProps {
@@ -24,6 +26,11 @@ const menuItems = [
     name: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    name: "Services",
+    href: "/dashboard/services",
+    icon: Briefcase,
   },
   {
     name: "Teams",
@@ -41,14 +48,14 @@ const menuItems = [
     icon: MessageSquare,
   },
   {
+    name: "FAQ",
+    href: "/dashboard/faq",
+    icon: HelpCircle,
+  },
+  {
     name: "Contact",
     href: "/dashboard/contact",
     icon: Mail,
-  },
-  {
-    name: "Services",
-    href: "/dashboard/services",
-    icon: Briefcase,
   },
 ];
 
@@ -57,6 +64,13 @@ export default function DashboardSidebar({
   setIsCollapsed,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
+
+  const handleLogout = () => {
+    if (confirm("Are you sure you want to logout?")) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+  };
 
   return (
     <motion.aside
@@ -125,7 +139,19 @@ export default function DashboardSidebar({
       </nav>
 
       {/* Collapse Button */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 space-y-2">
+        {/* Logout Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
+        >
+          <LogOut className="h-5 w-5" />
+          {!isCollapsed && <span className="font-medium">Logout</span>}
+        </motion.button>
+
+        {/* Collapse Button */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
