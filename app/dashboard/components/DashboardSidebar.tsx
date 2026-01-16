@@ -15,6 +15,7 @@ import {
   HelpCircle,
   LogOut,
   Calendar,
+  Image,
 } from "lucide-react";
 
 interface DashboardSidebarProps {
@@ -37,6 +38,11 @@ const menuItems = [
     name: "Services",
     href: "/dashboard/services",
     icon: Briefcase,
+  },
+  {
+    name: "Banners",
+    href: "/dashboard/banners",
+    icon: Image,
   },
   {
     name: "Teams",
