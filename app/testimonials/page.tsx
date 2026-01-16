@@ -12,6 +12,8 @@ interface Testimonial {
   _id: string;
   profileMedia: string;
   mediaType: string;
+  bannerMedia?: string;
+  bannerMediaType?: string;
   fullName: string;
   role: string;
   rating: number;
@@ -25,6 +27,8 @@ export default function TestimonialsPage() {
   const [filter, setFilter] = useState("all");
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [currentVideo, setCurrentVideo] = useState("");
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -72,9 +76,47 @@ export default function TestimonialsPage() {
     visible: { opacity: 1, y: 0 },
   };
 
+  const handleVideoClick = (videoUrl: string) => {
+    setCurrentVideo(videoUrl);
+    setVideoModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+
+      {/* Video Modal */}
+      {videoModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setVideoModalOpen(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full max-w-4xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setVideoModalOpen(false)}
+              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors flex items-center gap-2 text-sm font-medium"
+            >
+              <span>✕</span> Close
+            </button>
+            <div
+              className="relative w-full"
+              style={{ paddingBottom: "56.25%" }}
+            >
+              <video
+                src={currentVideo}
+                controls
+                autoPlay
+                className="absolute inset-0 w-full h-full rounded-2xl shadow-2xl object-contain bg-black"
+              />
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="py-20 px-4">
@@ -180,34 +222,72 @@ export default function TestimonialsPage() {
                 >
                   <Card className="h-full border-0 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
                     <CardContent className="p-0">
-                      {/* Logo Section */}
-                      <div className="relative h-64 bg-white flex flex-col items-center justify-start p-6 pt-8">
-                        {/* Reflex Logo */}
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.05, 1],
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                          className="mb-auto"
-                        >
-                          <img
-                            src="/images/logo3.png"
-                            alt="Reflex Physiotherapy"
-                            className="w-32 h-auto object-contain"
-                          />
-                        </motion.div>
+                      {/* Banner/Logo Section */}
+                      <div className="relative h-64 bg-white flex flex-col items-center justify-start overflow-hidden">
+                        {testimonial.bannerMedia ? (
+                          // Show Banner Media
+                          <>
+                            {testimonial.bannerMediaType === "video" ? (
+                              <div className="relative w-full h-full group">
+                                <video
+                                  src={getMediaUrl(testimonial.bannerMedia)}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                  loop
+                                  autoPlay
+                                />
+                                {/* Play Button Overlay */}
+                                <div
+                                  onClick={() =>
+                                    handleVideoClick(
+                                      getMediaUrl(testimonial.bannerMedia!)
+                                    )
+                                  }
+                                  className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <div className="bg-white/90 rounded-full p-4 hover:bg-white transition-colors">
+                                    <Play className="h-8 w-8 text-[#2e3192]" />
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <img
+                                src={getMediaUrl(testimonial.bannerMedia)}
+                                alt="Banner"
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </>
+                        ) : (
+                          // Show Reflex Logo (default)
+                          <div className="w-full h-full flex flex-col items-center justify-start p-6 pt-8">
+                            <motion.div
+                              animate={{
+                                scale: [1, 1.05, 1],
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                              className="mb-auto"
+                            >
+                              <img
+                                src="/images/logo3.png"
+                                alt="Reflex Physiotherapy"
+                                className="w-32 h-auto object-contain"
+                              />
+                            </motion.div>
 
-                        {/* Decorative Elements */}
-                        <div className="absolute top-4 left-4 w-12 h-12 border-2 border-[#2e3192]/10 rounded-full"></div>
-                        <div className="absolute bottom-20 right-4 w-10 h-10 border-2 border-[#4c46a3]/10 rounded-full"></div>
+                            {/* Decorative Elements */}
+                            <div className="absolute top-4 left-4 w-12 h-12 border-2 border-[#2e3192]/10 rounded-full"></div>
+                            <div className="absolute bottom-20 right-4 w-10 h-10 border-2 border-[#4c46a3]/10 rounded-full"></div>
+                          </div>
+                        )}
 
-                        {/* Patient Info Card */}
+                        {/* Patient Info Card - Always visible */}
                         <div className="absolute bottom-4 left-4 right-4">
-                          <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] rounded-xl p-3">
+                          <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] rounded-xl p-3 shadow-lg">
                             <div className="flex items-center space-x-3">
                               <img
                                 src={getMediaUrl(testimonial.profileMedia)}

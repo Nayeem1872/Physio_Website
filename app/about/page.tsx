@@ -444,6 +444,172 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Leadership Quotes */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+              Leadership Insights
+            </Badge>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              Words from Our Leaders
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Hear from the visionaries who guide our mission and commitment to
+              excellence in physiotherapy care.
+            </p>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Chairman Quote */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -5 }}
+            >
+              <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                      <Image
+                        src="/placeholder.svg?height=80&width=80"
+                        alt="Chairman"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="text-white">
+                      <h3 className="text-xl font-bold">Dr. [Chairman Name]</h3>
+                      <p className="text-sm text-white/90">Chairman</p>
+                      <Badge className="mt-1 bg-white/20 text-white border-0">
+                        Reflex Physiotherapy
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <CardContent className="p-8">
+                  <div className="relative">
+                    <motion.div
+                      className="absolute -top-4 -left-2 text-6xl text-[#2e3192]/10 font-serif"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{
+                        duration: 3,
+                        repeat: Number.POSITIVE_INFINITY,
+                      }}
+                    >
+                      "
+                    </motion.div>
+                    <p className="text-gray-700 text-lg leading-relaxed italic pl-8 mb-4">
+                      At Reflex Physiotherapy, we believe that every patient
+                      deserves personalized care that addresses not just their
+                      symptoms, but their overall wellbeing. Our commitment to
+                      evidence-based practice and compassionate care has been
+                      the cornerstone of our success in serving the Uttara
+                      community.
+                    </p>
+                    <motion.div
+                      className="absolute -bottom-2 right-0 text-6xl text-[#2e3192]/10 font-serif"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{
+                        duration: 3,
+                        repeat: Number.POSITIVE_INFINITY,
+                        delay: 1.5,
+                      }}
+                    >
+                      "
+                    </motion.div>
+                  </div>
+                  <div className="flex items-center gap-2 text-[#2e3192] mt-6 pt-4 border-t border-gray-200">
+                    <Award className="h-5 w-5" />
+                    <span className="text-sm font-semibold">
+                      Leading with Vision & Excellence
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* CEO/Founder Quote */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -5 }}
+            >
+              <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                      <Image
+                        src="/placeholder.svg?height=80&width=80"
+                        alt="CEO & Founder"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="text-white">
+                      <h3 className="text-xl font-bold">Dr. [Founder Name]</h3>
+                      <p className="text-sm text-white/90">CEO & Founder</p>
+                      <Badge className="mt-1 bg-white/20 text-white border-0">
+                        Reflex Physiotherapy
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <CardContent className="p-8">
+                  <div className="relative">
+                    <motion.div
+                      className="absolute -top-4 -left-2 text-6xl text-green-500/10 font-serif"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{
+                        duration: 3,
+                        repeat: Number.POSITIVE_INFINITY,
+                      }}
+                    >
+                      "
+                    </motion.div>
+                    <p className="text-gray-700 text-lg leading-relaxed italic pl-8 mb-4">
+                      When I founded Reflex Physiotherapy, my vision was simple
+                      yet profound: to create a center where advanced
+                      therapeutic techniques meet genuine human compassion. We
+                      don't just treat conditions; we transform lives by
+                      empowering our patients to achieve their fullest
+                      potential.
+                    </p>
+                    <motion.div
+                      className="absolute -bottom-2 right-0 text-6xl text-green-500/10 font-serif"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{
+                        duration: 3,
+                        repeat: Number.POSITIVE_INFINITY,
+                        delay: 1.5,
+                      }}
+                    >
+                      "
+                    </motion.div>
+                  </div>
+                  <div className="flex items-center gap-2 text-green-600 mt-6 pt-4 border-t border-gray-200">
+                    <Lightbulb className="h-5 w-5" />
+                    <span className="text-sm font-semibold">
+                      Innovation Meets Compassion
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Company Timeline */}
       <section className="py-20 bg-gradient-to-r from-[#2e3192]/5 to-purple-50">
         <div className="container mx-auto px-4">
