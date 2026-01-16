@@ -16,12 +16,26 @@ interface Banner {
   isActive: boolean;
 }
 
+interface ContactInfo {
+  _id: string;
+  phone: string[];
+  email: string[];
+  address: string[];
+  whatsapp: string[];
+  facebook: string;
+  instagram: string;
+  twitter: string;
+  linkedin: string;
+  youtube: string;
+}
+
 interface HeroSectionProps {
   banner: Banner | null;
   isLoading: boolean;
+  contactInfo: ContactInfo | null;
 }
 
-const HeroSection = ({ banner, isLoading }: HeroSectionProps) => {
+const HeroSection = ({ banner, isLoading, contactInfo }: HeroSectionProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Auto-rotate images every 5 seconds
@@ -138,26 +152,20 @@ const HeroSection = ({ banner, isLoading }: HeroSectionProps) => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <motion.div
-                animate={{
-                  y: [0, -10, 0],
-                  rotate: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-                className="relative z-10"
-              >
+              <div className="relative z-10">
                 {isLoading ? (
                   <div className="w-full h-[600px] bg-gray-200 rounded-2xl animate-pulse" />
                 ) : (
-                  <div className="relative w-full h-[600px]">
-                    <img
+                  <div className="relative w-full h-[600px] overflow-hidden rounded-2xl shadow-2xl">
+                    <motion.img
+                      key={currentImageIndex}
                       src={getImageUrl(images[currentImageIndex])}
                       alt="Reflex Physiotherapy"
-                      className="rounded-2xl shadow-2xl object-cover w-full h-full"
+                      className="w-full h-full object-cover"
+                      initial={{ opacity: 0, scale: 1.1 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.7, ease: "easeInOut" }}
                     />
                     {/* Image Indicators */}
                     {images.length > 1 && (
@@ -166,10 +174,10 @@ const HeroSection = ({ banner, isLoading }: HeroSectionProps) => {
                           <button
                             key={idx}
                             onClick={() => setCurrentImageIndex(idx)}
-                            className={`w-2 h-2 rounded-full transition-all ${
+                            className={`h-2 rounded-full transition-all duration-300 ${
                               idx === currentImageIndex
                                 ? "bg-white w-6"
-                                : "bg-white/50"
+                                : "bg-white/50 w-2"
                             }`}
                           />
                         ))}
@@ -177,7 +185,7 @@ const HeroSection = ({ banner, isLoading }: HeroSectionProps) => {
                     )}
                   </div>
                 )}
-              </motion.div>
+              </div>
 
               {/* Floating Elements */}
               <motion.div
@@ -204,29 +212,43 @@ const HeroSection = ({ banner, isLoading }: HeroSectionProps) => {
                 </div>
               </motion.div>
 
-              <motion.div
-                className="absolute z-20 -bottom-4 -left-9 bg-white p-4 rounded-xl shadow-lg"
-                animate={{
-                  y: [0, 15, 0],
-                  rotate: [0, -5, 0],
-                }}
-                transition={{
-                  duration: 3.5,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                  delay: 1,
-                }}
-              >
-                <div className="flex items-center space-x-2">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Users className="h-5 w-5 text-blue-600" />
+              {/* Hotline Floating Card */}
+              {contactInfo && contactInfo.phone && contactInfo.phone[0] && (
+                <motion.a
+                  href={`tel:${contactInfo.phone[0]}`}
+                  className="absolute z-20 -bottom-4 -left-9 bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                  animate={{
+                    y: [0, 15, 0],
+                    rotate: [0, -5, 0],
+                  }}
+                  transition={{
+                    duration: 3.5,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut",
+                    delay: 1,
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-[#2e3192] p-2 rounded-lg">
+                      <svg
+                        className="h-5 w-5 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">24/7 Hotline</p>
+                      <p className="text-xs text-[#2e3192] font-bold">
+                        {contactInfo.phone[0]}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-sm">Uttara</p>
-                    <p className="text-xs text-gray-600">Community Care</p>
-                  </div>
-                </div>
-              </motion.div>
+                </motion.a>
+              )}
             </motion.div>
           </div>
         </div>
