@@ -5,12 +5,57 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
 
-const HeroSection = () => {
+interface Banner {
+  _id: string;
+  section: string;
+  images: string[];
+  title: string;
+  subtitle: string;
+  isActive: boolean;
+}
+
+interface HeroSectionProps {
+  banner: Banner | null;
+  isLoading: boolean;
+}
+
+const HeroSection = ({ banner, isLoading }: HeroSectionProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Auto-rotate images every 5 seconds
+  useEffect(() => {
+    if (banner && banner.images.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prev) =>
+          prev === banner.images.length - 1 ? 0 : prev + 1
+        );
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [banner]);
+
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+    return `http://localhost:5000${imagePath}`;
+  };
+
   const scaleOnHover = {
     whileHover: { scale: 1.05 },
     whileTap: { scale: 0.95 },
   };
+
+  // Default content if no banner
+  const title =
+    banner?.title || "Welcome to Reflex Physiotherapy & Rehab Center";
+  const subtitle =
+    banner?.subtitle ||
+    "At Reflex, we are dedicated to helping you restore movement, relieve pain, and regain strength. Our team of expert physiotherapists and rehabilitation specialists provide personalized care using advanced techniques and state-of-the-art equipment. Whether you're recovering from an injury, surgery, or managing a chronic condition, we're here to support your journey to better health and wellness.";
+  const images = banner?.images || ["/images/pic2.jpg"];
 
   return (
     <div>
@@ -43,21 +88,7 @@ const HeroSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.8 }}
               >
-                Welcome to <br />
-                <motion.span
-                  className="text-transparent bg-clip-text bg-gradient-to-r from-[#2e3192] to-[#4c46a3]"
-                  animate={{
-                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: "linear",
-                  }}
-                >
-                  {" "}
-                  Reflex Physiotherapy <br /> & Rehab Center
-                </motion.span>
+                {title}
               </motion.h1>
 
               <motion.p
@@ -66,13 +97,7 @@ const HeroSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
-                At Reflex, we are dedicated to helping you restore movement,
-                relieve pain, and regain strength. Our team of expert
-                physiotherapists and rehabilitation specialists provide
-                personalized care using advanced techniques and state-of-the-art
-                equipment. Whether you're recovering from an injury, surgery, or
-                managing a chronic condition, we're here to support your journey
-                to better health and wellness.
+                {subtitle}
               </motion.p>
 
               <motion.div
@@ -164,14 +189,33 @@ const HeroSection = () => {
                 }}
                 className="relative z-10"
               >
-                <Image
-                  src="/images/pic2.jpg"
-                  alt="Patient undergoing physiotherapy at Reflex Center"
-                  width={500}
-                  height={600}
-                  className="rounded-2xl shadow-2xl object-cover w-full h-full"
-                  priority
-                />
+                {isLoading ? (
+                  <div className="w-full h-[600px] bg-gray-200 rounded-2xl animate-pulse" />
+                ) : (
+                  <div className="relative w-full h-[600px]">
+                    <img
+                      src={getImageUrl(images[currentImageIndex])}
+                      alt="Reflex Physiotherapy"
+                      className="rounded-2xl shadow-2xl object-cover w-full h-full"
+                    />
+                    {/* Image Indicators */}
+                    {images.length > 1 && (
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        {images.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentImageIndex(idx)}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                              idx === currentImageIndex
+                                ? "bg-white w-6"
+                                : "bg-white/50"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </motion.div>
 
               {/* Floating Elements */}

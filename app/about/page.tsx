@@ -24,8 +24,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -86,65 +86,6 @@ export default function AboutPage() {
     },
   ];
 
-  const teamMembers = [
-    {
-      name: "Dr. Maksudur Rahman",
-      role: "Lead Physiotherapist & Founder",
-      specialization: "Manual Therapy & Sports Rehabilitation",
-      experience: "Expert in Evidence-Based Practice",
-      education: "DPT, Advanced Manual Therapy Certification",
-      certifications: [
-        "Manual Therapy Certified",
-        "Sports Specialist",
-        "Dry Needling",
-      ],
-      bio: "Dr. Maksudur founded Reflex Physiotherapy with a passion for providing comprehensive, patient-centered care. He specializes in manual therapy and sports rehabilitation using evidence-based approaches.",
-      image: "/placeholder.svg?height=400&width=400",
-    },
-    {
-      name: "Dr. Farhan Ahmed",
-      role: "Pediatric Physiotherapy Specialist",
-      specialization: "Child Development & Movement",
-      experience: "Pediatric Care Expert",
-      education: "DPT, Pediatric Physiotherapy Specialization",
-      certifications: [
-        "Pediatric Specialist",
-        "NDT Certified",
-        "Sensory Integration",
-      ],
-      bio: "Dr. Farhan specializes in pediatric physiotherapy, helping children from birth to 19 years achieve optimal physical development and independence.",
-      image: "/placeholder.svg?height=400&width=400",
-    },
-    {
-      name: "Dr. Rafiq Hassan",
-      role: "Geriatric Physiotherapy Specialist",
-      specialization: "Elderly Care & Mobility",
-      experience: "Senior Care Specialist",
-      education: "DPT, Geriatric Rehabilitation Certification",
-      certifications: [
-        "Geriatric Specialist",
-        "Fall Prevention",
-        "Balance Training",
-      ],
-      bio: "Dr. Rafiq focuses on geriatric physiotherapy, addressing age-related conditions and helping seniors maintain mobility and quality of life.",
-      image: "/placeholder.svg?height=400&width=400",
-    },
-    {
-      name: "Dr. Fatima Khan",
-      role: "Post-Surgical Rehabilitation Specialist",
-      specialization: "Surgical Recovery & Rehabilitation",
-      experience: "Post-Surgical Care Expert",
-      education: "DPT, Orthopedic Manual Therapy",
-      certifications: [
-        "Orthopedic Specialist",
-        "Post-Surgical Rehab",
-        "Manual Therapy",
-      ],
-      bio: "Dr. Fatima specializes in post-surgical rehabilitation, helping patients regain strength and function after various surgical procedures.",
-      image: "/placeholder.svg?height=400&width=400",
-    },
-  ];
-
   const values = [
     {
       icon: Heart,
@@ -202,68 +143,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Header */}
-      <motion.header
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50"
-      >
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div
-              className="flex items-center space-x-2"
-              whileHover={{ scale: 1.05 }}
-            >
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] p-2 rounded-lg">
-                  <Activity className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-800">Reflex</h1>
-                  <p className="text-xs text-gray-600">
-                    Physiotherapy & Rehab Center
-                  </p>
-                </div>
-              </Link>
-            </motion.div>
-
-            <nav className="hidden md:flex space-x-8">
-              {[
-                { name: "Home", href: "/" },
-                { name: "Services", href: "/services" },
-                { name: "About", href: "/about" },
-                { name: "Team", href: "#team" },
-                { name: "Contact", href: "/#contact" },
-              ].map((item, index) => (
-                <motion.a
-                  key={item.name}
-                  href={item.href}
-                  className={`font-medium transition-colors ${
-                    item.name === "About"
-                      ? "text-[#2e3192] border-b-2 border-[#2e3192]"
-                      : "text-gray-700 hover:text-[#2e3192]"
-                  }`}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -2 }}
-                >
-                  {item.name}
-                </motion.a>
-              ))}
-            </nav>
-
-            <motion.div {...scaleOnHover}>
-              <Link href="/book">
-                <Button className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#252a7a] hover:to-[#3d3d8a]">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Book Now
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </motion.header>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="py-20 overflow-hidden">

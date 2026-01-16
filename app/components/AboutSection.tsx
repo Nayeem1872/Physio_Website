@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Award, CalendarDays, Clock, Heart, MapPin } from "lucide-react";
@@ -6,11 +6,57 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const AboutSection = () => {
+interface Banner {
+  _id: string;
+  section: string;
+  images: string[];
+  title: string;
+  subtitle: string;
+  isActive: boolean;
+}
+
+interface AboutSectionProps {
+  banner: Banner | null;
+  isLoading: boolean;
+}
+
+const AboutSection = ({ banner, isLoading }: AboutSectionProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Auto-rotate images every 5 seconds
+  useEffect(() => {
+    if (banner && banner.images.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prev) =>
+          prev === banner.images.length - 1 ? 0 : prev + 1
+        );
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [banner]);
+
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+    return `http://localhost:5000${imagePath}`;
+  };
+
   const scaleOnHover = {
     whileHover: { scale: 1.05 },
     whileTap: { scale: 0.95 },
   };
+
+  // Default content if no banner
+  const title = banner?.title || "Excellence in Physiotherapy Care Since 2024";
+  const subtitle =
+    banner?.subtitle ||
+    "Reflex Physiotherapy was established in 2024 with a vision to provide comprehensive and patient-centered physiotherapy care to individuals of all ages. The clinic started as a small practice catering to local residents in Uttara.\n\nOver time, Reflex Physiotherapy has grown significantly, expanding its services to include advanced techniques such as manual therapy, dry needling, electrotherapy, sports rehabilitation, and post-surgical recovery. Our team of dedicated professionals brings diverse expertise and a shared commitment to helping patients recover, regain mobility, and enhance their quality of life.";
+  const images = banner?.images || ["/images/pic3.jpg"];
+
+  // Split subtitle into paragraphs
+  const paragraphs = subtitle.split("\n\n").filter((p) => p.trim());
   return (
     <div>
       <section
@@ -31,24 +77,15 @@ const AboutSection = () => {
               >
                 About Reflex Physiotherapy
               </Badge>
-              <h2 className="text-4xl font-bold text-gray-800 mb-6">
-                Excellence in Physiotherapy Care Since 2024
-              </h2>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Reflex Physiotherapy was established in 2024 with a vision to
-                provide comprehensive and patient-centered physiotherapy care to
-                individuals of all ages. The clinic started as a small practice
-                catering to local residents in Uttara.
-              </p>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Over time, Reflex Physiotherapy has grown significantly,
-                expanding its services to include advanced techniques such as
-                manual therapy, dry needling, electrotherapy, sports
-                rehabilitation, and post-surgical recovery. Our team of
-                dedicated professionals brings diverse expertise and a shared
-                commitment to helping patients recover, regain mobility, and
-                enhance their quality of life.
-              </p>
+              <h2 className="text-4xl font-bold text-gray-800 mb-6">{title}</h2>
+              {paragraphs.map((paragraph, index) => (
+                <p
+                  key={index}
+                  className="text-lg text-gray-600 mb-8 leading-relaxed"
+                >
+                  {paragraph}
+                </p>
+              ))}
 
               <div className="grid grid-cols-2 gap-6 mb-8">
                 {[
@@ -132,13 +169,33 @@ const AboutSection = () => {
                   ease: "easeInOut",
                 }}
               >
-                <Image
-                  src="/images/pic3.jpg"
-                  alt="Reflex Physiotherapy Equipment"
-                  width={600}
-                  height={500}
-                  className="rounded-2xl shadow-2xl object-cover w-full h-full"
-                />
+                {isLoading ? (
+                  <div className="w-full h-[500px] bg-gray-200 rounded-2xl animate-pulse" />
+                ) : (
+                  <div className="relative w-full h-[500px]">
+                    <img
+                      src={getImageUrl(images[currentImageIndex])}
+                      alt="Reflex Physiotherapy"
+                      className="rounded-2xl shadow-2xl object-cover w-full h-full"
+                    />
+                    {/* Image Indicators */}
+                    {images.length > 1 && (
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        {images.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentImageIndex(idx)}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                              idx === currentImageIndex
+                                ? "bg-white w-6"
+                                : "bg-white/50"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </motion.div>
 
               <motion.div
