@@ -10,6 +10,7 @@ import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import LeadershipQuoteSection from "./components/LeadershipQuoteSection";
 import { motion } from "framer-motion";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Banner {
   _id: string;
@@ -71,7 +72,7 @@ export default function ReflexPhysiotherapyWebsite() {
       try {
         // Fetch banners
         const bannersResponse = await fetch(
-          "http://localhost:5000/api/banners?isActive=true"
+          `${BACKEND_URL}/api/banners?isActive=true`
         );
         if (bannersResponse.ok) {
           const banners: Banner[] = await bannersResponse.json();
@@ -83,7 +84,7 @@ export default function ReflexPhysiotherapyWebsite() {
 
         // Fetch testimonials
         const testimonialsResponse = await fetch(
-          "http://localhost:5000/api/testimonials"
+          `${BACKEND_URL}/api/testimonials`
         );
         if (testimonialsResponse.ok) {
           const data = await testimonialsResponse.json();
@@ -91,18 +92,14 @@ export default function ReflexPhysiotherapyWebsite() {
         }
 
         // Fetch contact info
-        const contactResponse = await fetch(
-          "http://localhost:5000/api/contact-info"
-        );
+        const contactResponse = await fetch(`${BACKEND_URL}/api/contact-info`);
         if (contactResponse.ok) {
           const data = await contactResponse.json();
           setContactInfo(data);
         }
 
         // Fetch leadership
-        const leadershipResponse = await fetch(
-          "http://localhost:5000/api/leadership"
-        );
+        const leadershipResponse = await fetch(`${BACKEND_URL}/api/leadership`);
         if (leadershipResponse.ok) {
           const data = await leadershipResponse.json();
           if (data.leadership && data.leadership.length > 0) {

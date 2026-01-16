@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Testimonial {
   _id: string;
@@ -42,7 +43,7 @@ const TestimonialSection = ({
     if (mediaPath.startsWith("http")) {
       return mediaPath;
     }
-    return `http://localhost:5000${mediaPath}`;
+    return `${BACKEND_URL}${mediaPath}`;
   };
 
   const nextTestimonial = () => {

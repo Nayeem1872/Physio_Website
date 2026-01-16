@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import LeadershipCard from "./LeadershipCard";
+import { BACKEND_URL } from "@/lib/config";
 
 export interface Leadership {
   _id: string;
@@ -42,14 +43,11 @@ export default function LeadershipList({
     try {
       setIsLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        "http://localhost:5000/api/leadership?all=true",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${BACKEND_URL}/api/leadership?all=true`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setLeadership(data.leadership || []);

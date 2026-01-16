@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import ServiceCard from "./ServiceCard";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Service {
   _id: string;
@@ -30,7 +31,7 @@ interface ServicesListProps {
 }
 
 // API - Get all services
-const API_BASE_URL = "http://localhost:5000/api/services";
+const API_BASE_URL = `${BACKEND_URL}/api/services`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -45,10 +46,10 @@ export const getAllServicesAPI = async (
 ): Promise<ServicesResponse> => {
   let url = API_BASE_URL;
   const params = new URLSearchParams();
-  
+
   if (all) params.append("all", "true");
   if (categoryId && categoryId !== "All") params.append("category", categoryId);
-  
+
   if (params.toString()) {
     url += `?${params.toString()}`;
   }

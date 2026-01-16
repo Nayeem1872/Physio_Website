@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { X, User, Save, Star } from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Testimonial {
   _id: string;
@@ -30,7 +31,7 @@ interface TestimonialFormProps {
 }
 
 // API - Upload media
-const API_BASE_URL = "http://localhost:5000/api/testimonials";
+const API_BASE_URL = `${BACKEND_URL}/api/testimonials`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -292,7 +293,7 @@ export default function TestimonialForm({
                       src={
                         imagePreview.startsWith("data:")
                           ? imagePreview
-                          : `http://localhost:5000${imagePreview}`
+                          : `${BACKEND_URL}${imagePreview}`
                       }
                       className="w-full h-full object-cover"
                       muted
@@ -302,7 +303,7 @@ export default function TestimonialForm({
                       src={
                         imagePreview.startsWith("data:")
                           ? imagePreview
-                          : `http://localhost:5000${imagePreview}`
+                          : `${BACKEND_URL}${imagePreview}`
                       }
                       alt="Preview"
                       fill
@@ -339,7 +340,7 @@ export default function TestimonialForm({
                       src={
                         bannerPreview.startsWith("data:")
                           ? bannerPreview
-                          : `http://localhost:5000${bannerPreview}`
+                          : `${BACKEND_URL}${bannerPreview}`
                       }
                       className="w-full h-full object-cover"
                       controls
@@ -350,7 +351,7 @@ export default function TestimonialForm({
                       src={
                         bannerPreview.startsWith("data:")
                           ? bannerPreview
-                          : `http://localhost:5000${bannerPreview}`
+                          : `${BACKEND_URL}${bannerPreview}`
                       }
                       alt="Banner Preview"
                       fill

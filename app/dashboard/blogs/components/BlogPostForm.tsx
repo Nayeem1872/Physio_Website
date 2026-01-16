@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import RichTextEditor from "./RichTextEditor";
 import { getAllBlogCategoriesAPI } from "./BlogCategoriesList";
+import { BACKEND_URL } from "@/lib/config";
 
 interface BlogPost {
   _id: string;
@@ -30,8 +31,8 @@ interface BlogPostFormProps {
 }
 
 // API - Create/Update Blog Post
-const API_BASE_URL = "http://localhost:5000/api/blogs";
-const UPLOAD_API_URL = "http://localhost:5000/api/team/upload";
+const API_BASE_URL = `${BACKEND_URL}/api/blogs`;
+const UPLOAD_API_URL = `${BACKEND_URL}/api/team/upload`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -137,10 +138,11 @@ export default function BlogPostForm({
 
   useEffect(() => {
     if (editingBlog) {
-      const categoryId = typeof editingBlog.category === "string" 
-        ? editingBlog.category 
-        : editingBlog.category._id;
-        
+      const categoryId =
+        typeof editingBlog.category === "string"
+          ? editingBlog.category
+          : editingBlog.category._id;
+
       setFormData({
         title: editingBlog.title,
         slug: editingBlog.slug,
@@ -399,7 +401,7 @@ export default function BlogPostForm({
                         src={
                           imagePreview.startsWith("data:")
                             ? imagePreview
-                            : `http://localhost:5000${imagePreview}`
+                            : `${BACKEND_URL}${imagePreview}`
                         }
                         alt="Preview"
                         fill
@@ -446,9 +448,7 @@ export default function BlogPostForm({
               </label>
               <RichTextEditor
                 content={formData.content}
-                onChange={(html) =>
-                  setFormData({ ...formData, content: html })
-                }
+                onChange={(html) => setFormData({ ...formData, content: html })}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Use the toolbar to format your blog content

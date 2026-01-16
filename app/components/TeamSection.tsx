@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { BACKEND_URL } from "@/lib/config";
 
 interface TeamMember {
   _id: string;
@@ -33,7 +34,7 @@ const TeamSection = () => {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/team");
+        const response = await fetch(`${BACKEND_URL}/api/team`);
         const data = await response.json();
         // Only show first 3 members, sorted by order
         const sortedMembers = (data.teamMembers || []).sort(
@@ -122,7 +123,7 @@ const TeamSection = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <Image
-                        src={`http://localhost:5000${member.profileImage}`}
+                        src={`${BACKEND_URL}${member.profileImage}`}
                         alt={member.fullName}
                         width={300}
                         height={300}

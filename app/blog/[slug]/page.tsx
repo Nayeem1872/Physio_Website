@@ -7,6 +7,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { Calendar, Clock, ArrowLeft, Share2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BACKEND_URL } from "@/lib/config";
 
 interface BlogPost {
   _id: string;
@@ -23,7 +24,7 @@ interface BlogPost {
 }
 
 // API - Get blog by ID
-const API_BASE_URL = "http://localhost:5000/api/blogs";
+const API_BASE_URL = `${BACKEND_URL}/api/blogs`;
 
 const getBlogById = async (id: string): Promise<BlogPost | null> => {
   try {
@@ -284,7 +285,7 @@ export default function BlogPostPage() {
         className="relative h-96 overflow-hidden"
       >
         <img
-          src={`http://localhost:5000${post.imageUrl}`}
+          src={`${BACKEND_URL}${post.imageUrl}`}
           alt={post.title}
           className="w-full h-full object-cover"
         />

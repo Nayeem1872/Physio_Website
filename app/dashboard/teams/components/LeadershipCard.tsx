@@ -12,6 +12,7 @@ import {
   Quote,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Leadership {
   _id: string;
@@ -49,7 +50,7 @@ export default function LeadershipCard({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/leadership/${leadership._id}`,
+        `${BACKEND_URL}/api/leadership/${leadership._id}`,
         {
           method: "DELETE",
           headers: {
@@ -77,7 +78,7 @@ export default function LeadershipCard({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/leadership/${leadership._id}`,
+        `${BACKEND_URL}/api/leadership/${leadership._id}`,
         {
           method: "PUT",
           headers: {
@@ -146,7 +147,7 @@ export default function LeadershipCard({
           <div className="flex items-center gap-4">
             <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
               <Image
-                src={`http://localhost:5000${leadership.image}`}
+                src={`${BACKEND_URL}${leadership.image}`}
                 alt={leadership.name}
                 fill
                 className="object-cover"

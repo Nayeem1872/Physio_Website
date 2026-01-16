@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Save } from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Milestone {
   _id: string;
@@ -60,8 +61,8 @@ export default function MilestoneForm({
     try {
       const token = localStorage.getItem("token");
       const url = editingMilestone
-        ? `http://localhost:5000/api/milestones/${editingMilestone._id}`
-        : "http://localhost:5000/api/milestones";
+        ? `${BACKEND_URL}/api/milestones/${editingMilestone._id}`
+        : `${BACKEND_URL}/api/milestones`;
 
       const response = await fetch(url, {
         method: editingMilestone ? "PUT" : "POST",

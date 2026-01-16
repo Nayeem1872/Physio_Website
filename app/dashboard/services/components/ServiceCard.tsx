@@ -14,6 +14,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { BACKEND_URL } from "@/lib/config"; from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Service {
@@ -41,7 +42,7 @@ interface ServiceCardProps {
 }
 
 // API - Delete service
-const API_BASE_URL = "http://localhost:5000/api/services";
+const API_BASE_URL = `${BACKEND_URL}/api/services`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -154,7 +155,7 @@ export default function ServiceCard({
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 {service.imageUrl ? (
                   <Image
-                    src={`http://localhost:5000${service.imageUrl}`}
+                    src={`${BACKEND_URL}${service.imageUrl}`}
                     alt={service.name}
                     width={48}
                     height={48}
@@ -167,7 +168,9 @@ export default function ServiceCard({
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Folder className="h-4 w-4" />
-                  <span className="text-sm opacity-90">{getCategoryName()}</span>
+                  <span className="text-sm opacity-90">
+                    {getCategoryName()}
+                  </span>
                 </div>
                 <h3 className="text-xl font-bold">{service.name}</h3>
               </div>

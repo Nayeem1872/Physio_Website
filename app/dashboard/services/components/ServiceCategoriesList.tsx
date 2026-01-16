@@ -1,8 +1,32 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Edit, Trash2, AlertTriangle, Activity, Heart, Stethoscope, Pill, Syringe, Thermometer, Zap, Shield, Brain, Eye, Ear, Bone, Dumbbell, Footprints, Hand, Smile, Baby, Users, Accessibility } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  AlertTriangle,
+  Activity,
+  Heart,
+  Stethoscope,
+  Pill,
+  Syringe,
+  Thermometer,
+  Zap,
+  Shield,
+  Brain,
+  Eye,
+  Ear,
+  Bone,
+  Dumbbell,
+  Footprints,
+  Hand,
+  Smile,
+  Baby,
+  Users,
+  Accessibility,
+} from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface ServiceCategory {
   _id: string;
@@ -26,11 +50,29 @@ interface ServiceCategoriesListProps {
 
 // Icon mapping
 const iconMap: { [key: string]: any } = {
-  Activity, Heart, Stethoscope, Pill, Syringe, Thermometer, Zap, Shield, Brain, Eye, Ear, Bone, Dumbbell, Footprints, Hand, Smile, Baby, Users, Accessibility
+  Activity,
+  Heart,
+  Stethoscope,
+  Pill,
+  Syringe,
+  Thermometer,
+  Zap,
+  Shield,
+  Brain,
+  Eye,
+  Ear,
+  Bone,
+  Dumbbell,
+  Footprints,
+  Hand,
+  Smile,
+  Baby,
+  Users,
+  Accessibility,
 };
 
 // API
-const API_BASE_URL = "http://localhost:5000/api/service-categories";
+const API_BASE_URL = `${BACKEND_URL}/api/service-categories`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -39,17 +81,18 @@ const getAuthHeaders = () => {
   };
 };
 
-export const getAllServiceCategoriesAPI = async (): Promise<ServiceCategoriesResponse> => {
-  const response = await fetch(API_BASE_URL, {
-    method: "GET",
-  });
+export const getAllServiceCategoriesAPI =
+  async (): Promise<ServiceCategoriesResponse> => {
+    const response = await fetch(API_BASE_URL, {
+      method: "GET",
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch service categories");
-  }
+    if (!response.ok) {
+      throw new Error("Failed to fetch service categories");
+    }
 
-  return response.json();
-};
+    return response.json();
+  };
 
 export const deleteServiceCategoryAPI = async (id: string): Promise<any> => {
   const response = await fetch(`${API_BASE_URL}/${id}`, {
@@ -72,7 +115,8 @@ export default function ServiceCategoriesList({
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState<ServiceCategory | null>(null);
+  const [deletingCategory, setDeletingCategory] =
+    useState<ServiceCategory | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {

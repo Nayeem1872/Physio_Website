@@ -14,6 +14,7 @@ import {
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Banner {
   _id: string;
@@ -51,7 +52,7 @@ export default function BannersManagementPage() {
 
   const fetchBanners = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/banners");
+      const response = await fetch(`${BACKEND_URL}/api/banners`);
       if (response.ok) {
         const data = await response.json();
         setBanners(data);
@@ -113,8 +114,8 @@ export default function BannersManagementPage() {
       });
 
       const url = editingBanner
-        ? `http://localhost:5000/api/banners/${editingBanner._id}`
-        : "http://localhost:5000/api/banners";
+        ? `${BACKEND_URL}/api/banners/${editingBanner._id}`
+        : `${BACKEND_URL}/api/banners`;
 
       const method = editingBanner ? "PUT" : "POST";
 
@@ -166,15 +167,12 @@ export default function BannersManagementPage() {
         // Get token from localStorage
         const token = localStorage.getItem("token");
 
-        const response = await fetch(
-          `http://localhost:5000/api/banners/${id}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${BACKEND_URL}/api/banners/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.ok) {
           setSuccessMessage("Banner deleted successfully!");
@@ -200,16 +198,13 @@ export default function BannersManagementPage() {
       formDataToSend.append("subtitle", banner.subtitle);
       formDataToSend.append("isActive", (!banner.isActive).toString());
 
-      const response = await fetch(
-        `http://localhost:5000/api/banners/${banner._id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formDataToSend,
-        }
-      );
+      const response = await fetch(`${BACKEND_URL}/api/banners/${banner._id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSend,
+      });
 
       if (response.ok) {
         fetchBanners();
@@ -579,7 +574,7 @@ function BannerCard({
     if (imagePath.startsWith("http")) {
       return imagePath;
     }
-    return `http://localhost:5000${imagePath}`;
+    return `${BACKEND_URL}${imagePath}`;
   };
 
   const nextImage = () => {

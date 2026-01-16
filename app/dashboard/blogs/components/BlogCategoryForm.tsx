@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface BlogCategory {
   _id: string;
@@ -21,7 +22,7 @@ interface BlogCategoryFormProps {
 }
 
 // API - Create/Update Blog Category
-const API_BASE_URL = "http://localhost:5000/api/blog-categories";
+const API_BASE_URL = `${BACKEND_URL}/api/blog-categories`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Tag, Edit, Trash2, Plus, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface BlogCategory {
   _id: string;
@@ -25,19 +26,20 @@ interface BlogCategoriesListProps {
 }
 
 // API - Get all blog categories
-const API_BASE_URL = "http://localhost:5000/api/blog-categories";
+const API_BASE_URL = `${BACKEND_URL}/api/blog-categories`;
 
-export const getAllBlogCategoriesAPI = async (): Promise<BlogCategoriesResponse> => {
-  const response = await fetch(API_BASE_URL, {
-    method: "GET",
-  });
+export const getAllBlogCategoriesAPI =
+  async (): Promise<BlogCategoriesResponse> => {
+    const response = await fetch(API_BASE_URL, {
+      method: "GET",
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch blog categories");
-  }
+    if (!response.ok) {
+      throw new Error("Failed to fetch blog categories");
+    }
 
-  return response.json();
-};
+    return response.json();
+  };
 
 // API - Delete blog category
 const getAuthHeaders = () => {
@@ -69,7 +71,9 @@ export default function BlogCategoriesList({
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState<BlogCategory | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<BlogCategory | null>(
+    null
+  );
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {

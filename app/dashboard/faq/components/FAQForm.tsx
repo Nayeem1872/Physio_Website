@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Save } from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface FAQ {
   _id: string;
@@ -23,7 +24,7 @@ interface FAQFormProps {
 }
 
 // API
-const API_BASE_URL = "http://localhost:5000/api/faqs";
+const API_BASE_URL = `${BACKEND_URL}/api/faqs`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -227,7 +228,10 @@ export default function FAQForm({
               }
               className="w-5 h-5 text-[#2e3192] border-gray-300 rounded focus:ring-[#2e3192]"
             />
-            <label htmlFor="published" className="text-sm font-medium text-gray-700">
+            <label
+              htmlFor="published"
+              className="text-sm font-medium text-gray-700"
+            >
               Publish this FAQ immediately
             </label>
           </div>

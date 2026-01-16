@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import TeamMemberCard from "./TeamMemberCard";
+import { BACKEND_URL } from "@/lib/config";
 
 interface TeamMember {
   id: string;
@@ -51,7 +52,7 @@ interface TeamMembersListProps {
 }
 
 // API - Get all team members
-const API_BASE_URL = "http://localhost:5000/api/team";
+const API_BASE_URL = `${BACKEND_URL}/api/team`;
 
 export const getAllTeamMembersAPI =
   async (): Promise<TeamMembersListResponse> => {

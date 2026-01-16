@@ -15,6 +15,7 @@ import {
   Briefcase,
   AlertTriangle,
 } from "lucide-react";
+import { BACKEND_URL } from "@/lib/config";
 
 interface TeamMember {
   id: string;
@@ -42,7 +43,7 @@ interface TeamMemberCardProps {
 }
 
 // API - Delete team member
-const API_BASE_URL = "http://localhost:5000/api/team";
+const API_BASE_URL = `${BACKEND_URL}/api/team`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -99,7 +100,7 @@ export default function TeamMemberCard({
       {/* Member Image */}
       <div className="relative h-48 bg-gradient-to-r from-[#2e3192] to-[#4c46a3]">
         <Image
-          src={`http://localhost:5000${member.image}`}
+          src={`${BACKEND_URL}${member.image}`}
           alt={member.name}
           fill
           className="object-cover"

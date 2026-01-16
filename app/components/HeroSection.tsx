@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Banner {
   _id: string;
@@ -55,7 +56,7 @@ const HeroSection = ({ banner, isLoading, contactInfo }: HeroSectionProps) => {
     if (imagePath.startsWith("http")) {
       return imagePath;
     }
-    return `http://localhost:5000${imagePath}`;
+    return `${BACKEND_URL}${imagePath}`;
   };
 
   const scaleOnHover = {

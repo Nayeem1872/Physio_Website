@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import BlogPostCard from "./BlogPostCard";
+import { BACKEND_URL } from "@/lib/config";
 
 interface BlogPost {
   _id: string;
@@ -28,7 +29,7 @@ interface BlogPostsListProps {
 }
 
 // API - Get all blog posts
-const API_BASE_URL = "http://localhost:5000/api/blogs";
+const API_BASE_URL = `${BACKEND_URL}/api/blogs`;
 
 export const getAllBlogPostsAPI = async (
   categoryId?: string

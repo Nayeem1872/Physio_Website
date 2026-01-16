@@ -1,7 +1,15 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Edit, Trash2, Eye, EyeOff, AlertTriangle, ChevronDown } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  AlertTriangle,
+  ChevronDown,
+} from "lucide-react";
+import { BACKEND_URL } from "@/lib/config"; from "lucide-react";
 import toast from "react-hot-toast";
 
 interface FAQ {
@@ -24,7 +32,7 @@ interface FAQCardProps {
 }
 
 // API - Delete FAQ
-const API_BASE_URL = "http://localhost:5000/api/faqs";
+const API_BASE_URL = `${BACKEND_URL}/api/faqs`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -98,7 +106,9 @@ export default function FAQCard({
     try {
       await togglePublishFAQAPI(faq._id, !faq.published);
       toast.success(
-        faq.published ? "FAQ unpublished successfully!" : "FAQ published successfully!"
+        faq.published
+          ? "FAQ unpublished successfully!"
+          : "FAQ published successfully!"
       );
       onTogglePublish(faq._id);
     } catch (error) {
@@ -212,7 +222,9 @@ export default function FAQCard({
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Delete FAQ</h3>
-                <p className="text-sm text-gray-600">This action cannot be undone</p>
+                <p className="text-sm text-gray-600">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
 

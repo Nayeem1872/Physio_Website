@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface BlogPost {
   _id: string;
@@ -36,7 +37,7 @@ interface BlogPostCardProps {
 }
 
 // API - Delete blog post
-const API_BASE_URL = "http://localhost:5000/api/blogs";
+const API_BASE_URL = `${BACKEND_URL}/api/blogs`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -117,7 +118,7 @@ export default function BlogPostCard({
         <div className="relative h-48 overflow-hidden bg-gray-100">
           {blog.imageUrl ? (
             <img
-              src={`http://localhost:5000${blog.imageUrl}`}
+              src={`${BACKEND_URL}${blog.imageUrl}`}
               alt={blog.title}
               className="w-full h-full object-cover"
             />
@@ -174,10 +175,12 @@ export default function BlogPostCard({
               variant="outline"
               size="sm"
               className="flex-1"
-              onClick={() => onEdit({
-                ...blog,
-                category: getCategoryId()
-              })}
+              onClick={() =>
+                onEdit({
+                  ...blog,
+                  category: getCategoryId(),
+                })
+              }
             >
               <Edit className="h-4 w-4 mr-1" />
               Edit

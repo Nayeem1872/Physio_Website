@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { X, Upload, Save } from "lucide-react";
+import { BACKEND_URL } from "@/lib/config";
 
 interface TeamMember {
   id: string;
@@ -31,7 +32,7 @@ interface TeamMemberFormProps {
 }
 
 // API - Upload Image
-const API_BASE_URL = "http://localhost:5000/api/team";
+const API_BASE_URL = `${BACKEND_URL}/api/team`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -306,7 +307,7 @@ export default function TeamMemberForm({
                     src={
                       imagePreview.startsWith("data:")
                         ? imagePreview
-                        : `http://localhost:5000${imagePreview}`
+                        : `${BACKEND_URL}${imagePreview}`
                     }
                     alt="Preview"
                     fill

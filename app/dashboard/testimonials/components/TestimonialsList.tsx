@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import TestimonialCard from "./TestimonialCard";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Testimonial {
   _id: string;
@@ -31,7 +32,7 @@ interface TestimonialsListProps {
 }
 
 // API - Get all testimonials
-const API_BASE_URL = "http://localhost:5000/api/testimonials";
+const API_BASE_URL = `${BACKEND_URL}/api/testimonials`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");

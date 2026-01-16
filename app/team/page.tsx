@@ -28,6 +28,7 @@ import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useEffect, useState } from "react";
+import { BACKEND_URL } from "@/lib/config";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -81,7 +82,7 @@ export default function TeamPage() {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/team");
+        const response = await fetch(`${BACKEND_URL}/api/team`);
         const data = await response.json();
         setTeamMembers(data.teamMembers || []);
       } catch (error) {
@@ -95,7 +96,11 @@ export default function TeamPage() {
   }, []);
 
   const teamStats = [
-    { number: `${teamMembers.length}+`, label: "Expert Therapists", icon: Users },
+    {
+      number: `${teamMembers.length}+`,
+      label: "Expert Therapists",
+      icon: Users,
+    },
     { number: "50+", label: "Years Combined Experience", icon: Award },
     { number: "100%", label: "Patient Satisfaction", icon: Heart },
     { number: "24/7", label: "Support Available", icon: Clock },
@@ -205,8 +210,6 @@ export default function TeamPage() {
         </div>
       </section>
 
-
-
       {/* Team Members */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -223,8 +226,11 @@ export default function TeamPage() {
               className="grid lg:grid-cols-2 gap-12"
             >
               {teamMembers.map((member, index) => {
-                const IconComponent = iconMap[Object.keys(iconMap)[index % Object.keys(iconMap).length]] || Hand;
-                
+                const IconComponent =
+                  iconMap[
+                    Object.keys(iconMap)[index % Object.keys(iconMap).length]
+                  ] || Hand;
+
                 return (
                   <motion.div
                     key={member._id}
@@ -241,7 +247,7 @@ export default function TeamPage() {
                             transition={{ duration: 0.3 }}
                           >
                             <Image
-                              src={`http://localhost:5000${member.profileImage}`}
+                              src={`${BACKEND_URL}${member.profileImage}`}
                               alt={member.fullName}
                               width={400}
                               height={500}
@@ -295,43 +301,45 @@ export default function TeamPage() {
                               </div>
                             </div>
 
-                            {member.certifications && member.certifications.length > 0 && (
-                              <div>
-                                <p className="text-sm text-gray-600 font-medium mb-2">
-                                  Certifications:
-                                </p>
-                                <div className="flex flex-wrap gap-1">
-                                  {member.certifications.map((cert, i) => (
-                                    <Badge
-                                      key={i}
-                                      variant="secondary"
-                                      className="text-xs bg-[#2e3192]/10 text-[#2e3192]"
-                                    >
-                                      {cert}
-                                    </Badge>
-                                  ))}
+                            {member.certifications &&
+                              member.certifications.length > 0 && (
+                                <div>
+                                  <p className="text-sm text-gray-600 font-medium mb-2">
+                                    Certifications:
+                                  </p>
+                                  <div className="flex flex-wrap gap-1">
+                                    {member.certifications.map((cert, i) => (
+                                      <Badge
+                                        key={i}
+                                        variant="secondary"
+                                        className="text-xs bg-[#2e3192]/10 text-[#2e3192]"
+                                      >
+                                        {cert}
+                                      </Badge>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            {member.specialties && member.specialties.length > 0 && (
-                              <div>
-                                <p className="text-sm text-gray-600 font-medium mb-2">
-                                  Specialties:
-                                </p>
-                                <div className="grid grid-cols-2 gap-1">
-                                  {member.specialties.map((specialty, i) => (
-                                    <div
-                                      key={i}
-                                      className="flex items-center text-xs text-gray-600"
-                                    >
-                                      <CheckCircle className="h-3 w-3 text-green-500 mr-1 flex-shrink-0" />
-                                      {specialty}
-                                    </div>
-                                  ))}
+                            {member.specialties &&
+                              member.specialties.length > 0 && (
+                                <div>
+                                  <p className="text-sm text-gray-600 font-medium mb-2">
+                                    Specialties:
+                                  </p>
+                                  <div className="grid grid-cols-2 gap-1">
+                                    {member.specialties.map((specialty, i) => (
+                                      <div
+                                        key={i}
+                                        className="flex items-center text-xs text-gray-600"
+                                      >
+                                        <CheckCircle className="h-3 w-3 text-green-500 mr-1 flex-shrink-0" />
+                                        {specialty}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
                             <p className="text-sm text-gray-600 leading-relaxed">
                               {member.biography}
@@ -350,12 +358,13 @@ export default function TeamPage() {
                                 <Clock className="h-4 w-4 mr-2 text-[#2e3192]" />
                                 {member.availability}
                               </div>
-                              {member.languages && member.languages.length > 0 && (
-                                <div className="flex items-center text-sm text-gray-600">
-                                  <BookOpen className="h-4 w-4 mr-2 text-[#2e3192]" />
-                                  Languages: {member.languages.join(", ")}
-                                </div>
-                              )}
+                              {member.languages &&
+                                member.languages.length > 0 && (
+                                  <div className="flex items-center text-sm text-gray-600">
+                                    <BookOpen className="h-4 w-4 mr-2 text-[#2e3192]" />
+                                    Languages: {member.languages.join(", ")}
+                                  </div>
+                                )}
                             </div>
 
                             <motion.div

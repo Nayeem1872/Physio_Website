@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { X, Save, User } from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Leadership {
   _id: string;
@@ -78,16 +79,13 @@ export default function LeadershipForm({
         const formDataUpload = new FormData();
         formDataUpload.append("image", file);
 
-        const response = await fetch(
-          "http://localhost:5000/api/leadership/upload",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: formDataUpload,
-          }
-        );
+        const response = await fetch(`${BACKEND_URL}/api/leadership/upload`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formDataUpload,
+        });
 
         if (response.ok) {
           const data = await response.json();
@@ -113,8 +111,8 @@ export default function LeadershipForm({
     try {
       const token = localStorage.getItem("token");
       const url = editingLeadership
-        ? `http://localhost:5000/api/leadership/${editingLeadership._id}`
-        : "http://localhost:5000/api/leadership";
+        ? `${BACKEND_URL}/api/leadership/${editingLeadership._id}`
+        : `${BACKEND_URL}/api/leadership`;
 
       const response = await fetch(url, {
         method: editingLeadership ? "PUT" : "POST",
@@ -198,7 +196,7 @@ export default function LeadershipForm({
                     src={
                       imagePreview.startsWith("data:")
                         ? imagePreview
-                        : `http://localhost:5000${imagePreview}`
+                        : `${BACKEND_URL}${imagePreview}`
                     }
                     alt="Preview"
                     fill

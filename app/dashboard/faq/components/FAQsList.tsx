@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import FAQCard from "./FAQCard";
+import { BACKEND_URL } from "@/lib/config";
 
 interface FAQ {
   _id: string;
@@ -26,7 +27,7 @@ interface FAQsListProps {
 }
 
 // API - Get all FAQs
-const API_BASE_URL = "http://localhost:5000/api/faqs";
+const API_BASE_URL = `${BACKEND_URL}/api/faqs`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -35,7 +36,9 @@ const getAuthHeaders = () => {
   };
 };
 
-export const getAllFAQsAPI = async (all: boolean = false): Promise<FAQsResponse> => {
+export const getAllFAQsAPI = async (
+  all: boolean = false
+): Promise<FAQsResponse> => {
   const url = all ? `${API_BASE_URL}?all=true` : API_BASE_URL;
   const headers = all ? getAuthHeaders() : {};
 

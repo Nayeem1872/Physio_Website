@@ -12,6 +12,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Testimonial {
   _id: string;
@@ -39,7 +40,7 @@ interface TestimonialCardProps {
 }
 
 // API - Delete testimonial
-const API_BASE_URL = "http://localhost:5000/api/testimonials";
+const API_BASE_URL = `${BACKEND_URL}/api/testimonials`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -136,7 +137,7 @@ export default function TestimonialCard({
           <div className="relative w-full h-48 bg-gradient-to-r from-[#2e3192] to-[#4c46a3]">
             {testimonial.bannerMediaType === "video" ? (
               <video
-                src={`http://localhost:5000${testimonial.bannerMedia}`}
+                src={`${BACKEND_URL}${testimonial.bannerMedia}`}
                 className="w-full h-full object-cover"
                 muted
                 loop
@@ -144,7 +145,7 @@ export default function TestimonialCard({
               />
             ) : (
               <Image
-                src={`http://localhost:5000${testimonial.bannerMedia}`}
+                src={`${BACKEND_URL}${testimonial.bannerMedia}`}
                 alt="Banner"
                 fill
                 className="object-cover"
@@ -169,13 +170,13 @@ export default function TestimonialCard({
               <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-r from-[#2e3192] to-[#4c46a3]">
                 {testimonial.mediaType === "video" ? (
                   <video
-                    src={`http://localhost:5000${testimonial.profileMedia}`}
+                    src={`${BACKEND_URL}${testimonial.profileMedia}`}
                     className="w-full h-full object-cover"
                     muted
                   />
                 ) : (
                   <Image
-                    src={`http://localhost:5000${testimonial.profileMedia}`}
+                    src={`${BACKEND_URL}${testimonial.profileMedia}`}
                     alt={testimonial.fullName}
                     fill
                     className="object-cover"

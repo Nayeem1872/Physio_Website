@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Calendar, Clock, ArrowRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Category {
   _id: string;
@@ -37,7 +38,7 @@ export default function BlogPage() {
     const fetchData = async () => {
       try {
         // Fetch blogs
-        const blogsResponse = await fetch("http://localhost:5000/api/blogs");
+        const blogsResponse = await fetch(`${BACKEND_URL}/api/blogs`);
         if (blogsResponse.ok) {
           const blogsData = await blogsResponse.json();
           setBlogPosts(blogsData.blogs || []);
@@ -45,7 +46,7 @@ export default function BlogPage() {
 
         // Fetch categories
         const categoriesResponse = await fetch(
-          "http://localhost:5000/api/blog-categories"
+          `${BACKEND_URL}/api/blog-categories`
         );
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json();
@@ -68,7 +69,7 @@ export default function BlogPage() {
     if (imagePath.startsWith("http")) {
       return imagePath;
     }
-    return `http://localhost:5000${imagePath}`;
+    return `${BACKEND_URL}${imagePath}`;
   };
 
   const formatDate = (dateString: string) => {

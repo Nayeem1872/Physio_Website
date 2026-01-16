@@ -1,8 +1,31 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { X, Save, Activity, Heart, Stethoscope, Pill, Syringe, Thermometer, Zap, Shield, Brain, Eye, Ear, Bone, Dumbbell, Footprints, Hand, Smile, Baby, Users, Accessibility } from "lucide-react";
+import {
+  X,
+  Save,
+  Activity,
+  Heart,
+  Stethoscope,
+  Pill,
+  Syringe,
+  Thermometer,
+  Zap,
+  Shield,
+  Brain,
+  Eye,
+  Ear,
+  Bone,
+  Dumbbell,
+  Footprints,
+  Hand,
+  Smile,
+  Baby,
+  Users,
+  Accessibility,
+} from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface ServiceCategory {
   _id: string;
@@ -45,7 +68,7 @@ const medicalIcons = [
 ];
 
 // API
-const API_BASE_URL = "http://localhost:5000/api/service-categories";
+const API_BASE_URL = `${BACKEND_URL}/api/service-categories`;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -155,7 +178,9 @@ export default function ServiceCategoryForm({
       >
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">
-            {editingCategory ? "Edit Service Category" : "Add New Service Category"}
+            {editingCategory
+              ? "Edit Service Category"
+              : "Add New Service Category"}
           </h2>
           <button
             onClick={onClose}

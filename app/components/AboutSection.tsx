@@ -5,6 +5,7 @@ import { Award, CalendarDays, Clock, Heart, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Banner {
   _id: string;
@@ -40,7 +41,7 @@ const AboutSection = ({ banner, isLoading }: AboutSectionProps) => {
     if (imagePath.startsWith("http")) {
       return imagePath;
     }
-    return `http://localhost:5000${imagePath}`;
+    return `${BACKEND_URL}${imagePath}`;
   };
 
   const scaleOnHover = {

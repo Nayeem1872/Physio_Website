@@ -27,6 +27,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import { BACKEND_URL } from "@/lib/config";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -95,7 +96,7 @@ export default function AboutPage() {
     // Fetch milestones from API
     const fetchMilestones = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/milestones");
+        const response = await fetch(`${BACKEND_URL}/api/milestones`);
         if (response.ok) {
           const data = await response.json();
           if (data.milestones && data.milestones.length > 0) {
@@ -110,7 +111,7 @@ export default function AboutPage() {
     // Fetch leadership from API
     const fetchLeadership = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/leadership");
+        const response = await fetch(`${BACKEND_URL}/api/leadership`);
         if (response.ok) {
           const data = await response.json();
           if (data.leadership && data.leadership.length > 0) {
@@ -126,7 +127,7 @@ export default function AboutPage() {
     const fetchBanner = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/banners?isActive=true"
+          `${BACKEND_URL}/api/banners?isActive=true`
         );
         if (response.ok) {
           const banners = await response.json();
@@ -336,7 +337,7 @@ export default function AboutPage() {
                           className="absolute inset-0"
                         >
                           <Image
-                            src={`http://localhost:5000${banner}`}
+                            src={`${BACKEND_URL}${banner}`}
                             alt={`Reflex Physiotherapy ${index + 1}`}
                             fill
                             className="object-cover"
@@ -614,7 +615,7 @@ export default function AboutPage() {
                         <div className="flex items-center gap-4">
                           <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
                             <Image
-                              src={`http://localhost:5000${leader.image}`}
+                              src={`${BACKEND_URL}${leader.image}`}
                               alt={leader.name}
                               fill
                               className="object-cover"

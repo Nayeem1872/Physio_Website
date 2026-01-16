@@ -18,6 +18,7 @@ import {
 import { Toaster } from "react-hot-toast";
 import MilestonesList from "./components/MilestonesList";
 import MilestoneForm from "./components/MilestoneForm";
+import { BACKEND_URL } from "@/lib/config";
 
 export interface Milestone {
   _id: string;
@@ -54,7 +55,7 @@ export default function MilestonesPage() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/milestones", {
+      const response = await fetch(`${BACKEND_URL}/api/milestones`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

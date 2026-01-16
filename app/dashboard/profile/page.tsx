@@ -14,6 +14,7 @@ import {
   Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BACKEND_URL } from "@/lib/config";
 
 export default function ProfilePage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -45,7 +46,7 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -120,7 +121,7 @@ export default function ProfilePage() {
       // Get token from localStorage
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/api/auth/profile", {
+      const response = await fetch(`${BACKEND_URL}/api/auth/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

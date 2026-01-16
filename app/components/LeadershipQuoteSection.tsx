@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Quote, Award, Lightbulb } from "lucide-react";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Leadership {
   _id: string;
@@ -73,7 +74,7 @@ export default function LeadershipQuoteSection({
                   className={`relative w-64 h-64 mx-auto rounded-full overflow-hidden shadow-2xl bg-gradient-to-br ${gradientColor} border-4 border-white`}
                 >
                   <Image
-                    src={`http://localhost:5000${leadership.image}`}
+                    src={`${BACKEND_URL}${leadership.image}`}
                     alt={leadership.name}
                     fill
                     className="object-cover"

@@ -11,6 +11,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Milestone {
   _id: string;
@@ -44,7 +45,7 @@ export default function MilestoneCard({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/milestones/${milestone._id}`,
+        `${BACKEND_URL}/api/milestones/${milestone._id}`,
         {
           method: "DELETE",
           headers: {
@@ -72,7 +73,7 @@ export default function MilestoneCard({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/milestones/${milestone._id}`,
+        `${BACKEND_URL}/api/milestones/${milestone._id}`,
         {
           method: "PUT",
           headers: {

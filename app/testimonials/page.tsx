@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Play, Filter } from "lucide-react";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Testimonial {
   _id: string;
@@ -33,7 +34,7 @@ export default function TestimonialsPage() {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/testimonials");
+        const response = await fetch(`${BACKEND_URL}/api/testimonials`);
         if (response.ok) {
           const data = await response.json();
           setTestimonials(data.testimonials || []);
@@ -52,7 +53,7 @@ export default function TestimonialsPage() {
     if (mediaPath.startsWith("http")) {
       return mediaPath;
     }
-    return `http://localhost:5000${mediaPath}`;
+    return `${BACKEND_URL}${mediaPath}`;
   };
 
   const formatDate = (dateString: string) => {
