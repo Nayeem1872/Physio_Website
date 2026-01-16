@@ -3,13 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
-import {
-  Plus,
-  Quote,
-  CheckCircle,
-  Clock,
-  Star,
-} from "lucide-react";
+import { Plus, Quote, CheckCircle, Clock, Star } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import TestimonialsList, {
   getAllTestimonialsAPI,
@@ -20,6 +14,8 @@ interface Testimonial {
   _id: string;
   profileMedia: string;
   mediaType: "image" | "video";
+  bannerMedia: string;
+  bannerMediaType: "image" | "video";
   fullName: string;
   role: string;
   rating: number;
@@ -35,8 +31,11 @@ export default function TestimonialsPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
-  const [filterStatus, setFilterStatus] = useState<"all" | "published" | "unpublished">("all");
+  const [editingTestimonial, setEditingTestimonial] =
+    useState<Testimonial | null>(null);
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "published" | "unpublished"
+  >("all");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
@@ -156,7 +155,9 @@ export default function TestimonialsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.total}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
                   <Quote className="h-6 w-6 text-blue-600" />
@@ -173,7 +174,9 @@ export default function TestimonialsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Published</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.published}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.published}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
                   <CheckCircle className="h-6 w-6 text-green-600" />
@@ -190,7 +193,9 @@ export default function TestimonialsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Pending</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.unpublished}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.unpublished}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
                   <Clock className="h-6 w-6 text-orange-600" />
@@ -207,7 +212,9 @@ export default function TestimonialsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Avg Rating</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.avgRating}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.avgRating}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
                   <Star className="h-6 w-6 text-yellow-600 fill-yellow-600" />

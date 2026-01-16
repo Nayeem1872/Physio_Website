@@ -6,6 +6,8 @@ interface Testimonial {
   _id: string;
   profileMedia: string;
   mediaType: "image" | "video";
+  bannerMedia: string;
+  bannerMediaType: "image" | "video";
   fullName: string;
   role: string;
   rating: number;

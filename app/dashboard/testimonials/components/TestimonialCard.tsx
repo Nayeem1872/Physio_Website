@@ -17,6 +17,8 @@ interface Testimonial {
   _id: string;
   profileMedia: string;
   mediaType: "image" | "video";
+  bannerMedia: string;
+  bannerMediaType: "image" | "video";
   fullName: string;
   role: string;
   rating: number;
@@ -60,7 +62,10 @@ export const deleteTestimonialAPI = async (id: string): Promise<any> => {
 };
 
 // API - Toggle publish status
-export const togglePublishAPI = async (id: string, published: boolean): Promise<any> => {
+export const togglePublishAPI = async (
+  id: string,
+  published: boolean
+): Promise<any> => {
   const response = await fetch(`${API_BASE_URL}/${id}`, {
     method: "PUT",
     headers: {
@@ -126,6 +131,28 @@ export default function TestimonialCard({
         transition={{ delay: index * 0.1 }}
         className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden relative"
       >
+        {/* Banner Media */}
+        {testimonial.bannerMedia && (
+          <div className="relative w-full h-48 bg-gradient-to-r from-[#2e3192] to-[#4c46a3]">
+            {testimonial.bannerMediaType === "video" ? (
+              <video
+                src={`http://localhost:5000${testimonial.bannerMedia}`}
+                className="w-full h-full object-cover"
+                muted
+                loop
+                autoPlay
+              />
+            ) : (
+              <Image
+                src={`http://localhost:5000${testimonial.bannerMedia}`}
+                alt="Banner"
+                fill
+                className="object-cover"
+              />
+            )}
+          </div>
+        )}
+
         {/* Status Badge */}
         {testimonial.published && (
           <div className="absolute top-4 right-4 z-10">
@@ -140,12 +167,20 @@ export default function TestimonialCard({
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-r from-[#2e3192] to-[#4c46a3]">
-                <Image
-                  src={`http://localhost:5000${testimonial.profileMedia}`}
-                  alt={testimonial.fullName}
-                  fill
-                  className="object-cover"
-                />
+                {testimonial.mediaType === "video" ? (
+                  <video
+                    src={`http://localhost:5000${testimonial.profileMedia}`}
+                    className="w-full h-full object-cover"
+                    muted
+                  />
+                ) : (
+                  <Image
+                    src={`http://localhost:5000${testimonial.profileMedia}`}
+                    alt={testimonial.fullName}
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">

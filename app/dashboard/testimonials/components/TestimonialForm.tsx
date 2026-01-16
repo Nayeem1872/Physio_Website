@@ -9,6 +9,8 @@ interface Testimonial {
   _id: string;
   profileMedia: string;
   mediaType: "image" | "video";
+  bannerMedia: string;
+  bannerMediaType: "image" | "video";
   fullName: string;
   role: string;
   rating: number;
@@ -104,11 +106,14 @@ export default function TestimonialForm({
   onSuccess,
 }: TestimonialFormProps) {
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [bannerPreview, setBannerPreview] = useState<string>("");
   const [formData, setFormData] = useState({
     fullName: "",
     role: "",
     profileMedia: "",
     mediaType: "image" as "image" | "video",
+    bannerMedia: "",
+    bannerMediaType: "image" as "image" | "video",
     rating: 5,
     testimonial: "",
     service: "",
@@ -123,6 +128,8 @@ export default function TestimonialForm({
         role: editingTestimonial.role,
         profileMedia: editingTestimonial.profileMedia,
         mediaType: editingTestimonial.mediaType,
+        bannerMedia: editingTestimonial.bannerMedia || "",
+        bannerMediaType: editingTestimonial.bannerMediaType || "image",
         rating: editingTestimonial.rating,
         testimonial: editingTestimonial.testimonial,
         service: editingTestimonial.service,
@@ -130,6 +137,7 @@ export default function TestimonialForm({
         published: editingTestimonial.published,
       });
       setImagePreview(editingTestimonial.profileMedia);
+      setBannerPreview(editingTestimonial.bannerMedia || "");
     } else {
       resetForm();
     }
@@ -144,14 +152,45 @@ export default function TestimonialForm({
       };
       reader.readAsDataURL(file);
 
-      const uploadToast = toast.loading("Uploading media...");
+      const uploadToast = toast.loading("Uploading profile media...");
       try {
         const mediaUrl = await uploadMediaAPI(file);
-        setFormData({ ...formData, profileMedia: mediaUrl });
-        toast.success("Media uploaded successfully!", { id: uploadToast });
+        const mediaType = file.type.startsWith("video/") ? "video" : "image";
+        setFormData({ ...formData, profileMedia: mediaUrl, mediaType });
+        toast.success("Profile media uploaded successfully!", {
+          id: uploadToast,
+        });
       } catch (error) {
         console.error("Error uploading media:", error);
         toast.error("Failed to upload media", { id: uploadToast });
+      }
+    }
+  };
+
+  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBannerPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      const uploadToast = toast.loading("Uploading banner media...");
+      try {
+        const mediaUrl = await uploadMediaAPI(file);
+        const mediaType = file.type.startsWith("video/") ? "video" : "image";
+        setFormData({
+          ...formData,
+          bannerMedia: mediaUrl,
+          bannerMediaType: mediaType,
+        });
+        toast.success("Banner media uploaded successfully!", {
+          id: uploadToast,
+        });
+      } catch (error) {
+        console.error("Error uploading banner:", error);
+        toast.error("Failed to upload banner", { id: uploadToast });
       }
     }
   };
@@ -167,6 +206,8 @@ export default function TestimonialForm({
       const payload = {
         profileMedia: formData.profileMedia,
         mediaType: formData.mediaType,
+        bannerMedia: formData.bannerMedia,
+        bannerMediaType: formData.bannerMediaType,
         fullName: formData.fullName,
         role: formData.role,
         rating: formData.rating,
@@ -199,6 +240,8 @@ export default function TestimonialForm({
       role: "",
       profileMedia: "",
       mediaType: "image",
+      bannerMedia: "",
+      bannerMediaType: "image",
       rating: 5,
       testimonial: "",
       service: "",
@@ -206,6 +249,7 @@ export default function TestimonialForm({
       published: true,
     });
     setImagePreview("");
+    setBannerPreview("");
   };
 
   const handleCancel = () => {
@@ -235,35 +279,95 @@ export default function TestimonialForm({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Image Upload */}
+          {/* Profile Media Upload */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Profile Image
+              Profile Media (Image/Video)
             </label>
             <div className="flex items-center gap-4">
               {imagePreview && (
                 <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                  <Image
-                    src={
-                      imagePreview.startsWith("data:")
-                        ? imagePreview
-                        : `http://localhost:5000${imagePreview}`
-                    }
-                    alt="Preview"
-                    fill
-                    className="object-cover"
-                  />
+                  {formData.mediaType === "video" ? (
+                    <video
+                      src={
+                        imagePreview.startsWith("data:")
+                          ? imagePreview
+                          : `http://localhost:5000${imagePreview}`
+                      }
+                      className="w-full h-full object-cover"
+                      muted
+                    />
+                  ) : (
+                    <Image
+                      src={
+                        imagePreview.startsWith("data:")
+                          ? imagePreview
+                          : `http://localhost:5000${imagePreview}`
+                      }
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  )}
                 </div>
               )}
               <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors">
                 <User className="h-5 w-5 text-gray-600" />
                 <span className="text-sm font-medium text-gray-700">
-                  Upload Image
+                  Upload Profile Media
                 </span>
                 <input
                   type="file"
                   accept="image/*,video/*"
                   onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Banner Media Upload */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Banner Media (Image/Video) - Optional
+            </label>
+            <div className="space-y-3">
+              {bannerPreview && (
+                <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-gray-200">
+                  {formData.bannerMediaType === "video" ? (
+                    <video
+                      src={
+                        bannerPreview.startsWith("data:")
+                          ? bannerPreview
+                          : `http://localhost:5000${bannerPreview}`
+                      }
+                      className="w-full h-full object-cover"
+                      controls
+                      muted
+                    />
+                  ) : (
+                    <Image
+                      src={
+                        bannerPreview.startsWith("data:")
+                          ? bannerPreview
+                          : `http://localhost:5000${bannerPreview}`
+                      }
+                      alt="Banner Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  )}
+                </div>
+              )}
+              <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors w-fit">
+                <User className="h-5 w-5 text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  Upload Banner Media
+                </span>
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleBannerChange}
                   className="hidden"
                 />
               </label>
