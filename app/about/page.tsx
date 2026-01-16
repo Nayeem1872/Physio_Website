@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,6 @@ import {
   Award,
   Calendar,
   Phone,
-  MapPin,
   Clock,
   CheckCircle,
   Target,
@@ -47,7 +47,7 @@ const scaleOnHover = {
 };
 
 export default function AboutPage() {
-  const milestones = [
+  const [milestones, setMilestones] = useState([
     {
       year: "2024",
       title: "Reflex Physiotherapy Founded",
@@ -84,7 +84,44 @@ export default function AboutPage() {
       description:
         "Continuing to evolve and provide the best rehabilitation services in Uttara with individualized treatment plans.",
     },
-  ];
+  ]);
+
+  const [leadership, setLeadership] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Fetch milestones from API
+    const fetchMilestones = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/milestones");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.milestones && data.milestones.length > 0) {
+            setMilestones(data.milestones);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching milestones:", error);
+      }
+    };
+
+    // Fetch leadership from API
+    const fetchLeadership = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/leadership");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.leadership && data.leadership.length > 0) {
+            setLeadership(data.leadership);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching leadership:", error);
+      }
+    };
+
+    fetchMilestones();
+    fetchLeadership();
+  }, []);
 
   const values = [
     {
@@ -467,151 +504,264 @@ export default function AboutPage() {
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Chairman Quote */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-            >
-              <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                      <Image
-                        src="/placeholder.svg?height=80&width=80"
-                        alt="Chairman"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="text-white">
-                      <h3 className="text-xl font-bold">Dr. [Chairman Name]</h3>
-                      <p className="text-sm text-white/90">Chairman</p>
-                      <Badge className="mt-1 bg-white/20 text-white border-0">
-                        Reflex Physiotherapy
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <CardContent className="p-8">
-                  <div className="relative">
-                    <motion.div
-                      className="absolute -top-4 -left-2 text-6xl text-[#2e3192]/10 font-serif"
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{
-                        duration: 3,
-                        repeat: Number.POSITIVE_INFINITY,
-                      }}
-                    >
-                      "
-                    </motion.div>
-                    <p className="text-gray-700 text-lg leading-relaxed italic pl-8 mb-4">
-                      At Reflex Physiotherapy, we believe that every patient
-                      deserves personalized care that addresses not just their
-                      symptoms, but their overall wellbeing. Our commitment to
-                      evidence-based practice and compassionate care has been
-                      the cornerstone of our success in serving the Uttara
-                      community.
-                    </p>
-                    <motion.div
-                      className="absolute -bottom-2 right-0 text-6xl text-[#2e3192]/10 font-serif"
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{
-                        duration: 3,
-                        repeat: Number.POSITIVE_INFINITY,
-                        delay: 1.5,
-                      }}
-                    >
-                      "
-                    </motion.div>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#2e3192] mt-6 pt-4 border-t border-gray-200">
-                    <Award className="h-5 w-5" />
-                    <span className="text-sm font-semibold">
-                      Leading with Vision & Excellence
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+            {/* Display leadership from API or fallback to default */}
+            {leadership.length > 0 ? (
+              leadership.map((leader, index) => {
+                const getRoleColor = (role: string) => {
+                  switch (role) {
+                    case "chairman":
+                      return "from-[#2e3192] to-[#4c46a3]";
+                    case "ceo":
+                      return "from-green-500 to-green-600";
+                    default:
+                      return "from-purple-500 to-purple-600";
+                  }
+                };
 
-            {/* CEO/Founder Quote */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-            >
-              <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                <div className="bg-gradient-to-r from-green-500 to-green-600 p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                      <Image
-                        src="/placeholder.svg?height=80&width=80"
-                        alt="CEO & Founder"
-                        fill
-                        className="object-cover"
-                      />
+                return (
+                  <motion.div
+                    key={leader._id}
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                    viewport={{ once: true }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                      <div
+                        className={`bg-gradient-to-r ${getRoleColor(leader.role)} p-6`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                            <Image
+                              src={`http://localhost:5000${leader.image}`}
+                              alt={leader.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="text-white">
+                            <h3 className="text-xl font-bold">{leader.name}</h3>
+                            <p className="text-sm text-white/90">
+                              {leader.position}
+                            </p>
+                            <Badge className="mt-1 bg-white/20 text-white border-0">
+                              {leader.badge || "Reflex Physiotherapy"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <CardContent className="p-8">
+                        <div className="relative">
+                          <motion.div
+                            className={`absolute -top-4 -left-2 text-6xl ${
+                              leader.role === "chairman"
+                                ? "text-[#2e3192]/10"
+                                : "text-green-500/10"
+                            } font-serif`}
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{
+                              duration: 3,
+                              repeat: Number.POSITIVE_INFINITY,
+                            }}
+                          >
+                            "
+                          </motion.div>
+                          <p className="text-gray-700 text-lg leading-relaxed italic pl-8 mb-4">
+                            {leader.quote}
+                          </p>
+                          <motion.div
+                            className={`absolute -bottom-2 right-0 text-6xl ${
+                              leader.role === "chairman"
+                                ? "text-[#2e3192]/10"
+                                : "text-green-500/10"
+                            } font-serif`}
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{
+                              duration: 3,
+                              repeat: Number.POSITIVE_INFINITY,
+                              delay: 1.5,
+                            }}
+                          >
+                            "
+                          </motion.div>
+                        </div>
+                        <div
+                          className={`flex items-center gap-2 ${
+                            leader.role === "chairman"
+                              ? "text-[#2e3192]"
+                              : "text-green-600"
+                          } mt-6 pt-4 border-t border-gray-200`}
+                        >
+                          {leader.role === "chairman" ? (
+                            <Award className="h-5 w-5" />
+                          ) : (
+                            <Lightbulb className="h-5 w-5" />
+                          )}
+                          <span className="text-sm font-semibold">
+                            {leader.role === "chairman"
+                              ? "Leading with Vision & Excellence"
+                              : "Innovation Meets Compassion"}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <>
+                {/* Fallback: Chairman Quote */}
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -5 }}
+                >
+                  <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                    <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                          <Image
+                            src="/placeholder.svg?height=80&width=80"
+                            alt="Chairman"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="text-white">
+                          <h3 className="text-xl font-bold">
+                            Dr. [Chairman Name]
+                          </h3>
+                          <p className="text-sm text-white/90">Chairman</p>
+                          <Badge className="mt-1 bg-white/20 text-white border-0">
+                            Reflex Physiotherapy
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-white">
-                      <h3 className="text-xl font-bold">Dr. [Founder Name]</h3>
-                      <p className="text-sm text-white/90">CEO & Founder</p>
-                      <Badge className="mt-1 bg-white/20 text-white border-0">
-                        Reflex Physiotherapy
-                      </Badge>
+                    <CardContent className="p-8">
+                      <div className="relative">
+                        <motion.div
+                          className="absolute -top-4 -left-2 text-6xl text-[#2e3192]/10 font-serif"
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{
+                            duration: 3,
+                            repeat: Number.POSITIVE_INFINITY,
+                          }}
+                        >
+                          "
+                        </motion.div>
+                        <p className="text-gray-700 text-lg leading-relaxed italic pl-8 mb-4">
+                          At Reflex Physiotherapy, we believe that every patient
+                          deserves personalized care that addresses not just
+                          their symptoms, but their overall wellbeing. Our
+                          commitment to evidence-based practice and
+                          compassionate care has been the cornerstone of our
+                          success in serving the Uttara community.
+                        </p>
+                        <motion.div
+                          className="absolute -bottom-2 right-0 text-6xl text-[#2e3192]/10 font-serif"
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{
+                            duration: 3,
+                            repeat: Number.POSITIVE_INFINITY,
+                            delay: 1.5,
+                          }}
+                        >
+                          "
+                        </motion.div>
+                      </div>
+                      <div className="flex items-center gap-2 text-[#2e3192] mt-6 pt-4 border-t border-gray-200">
+                        <Award className="h-5 w-5" />
+                        <span className="text-sm font-semibold">
+                          Leading with Vision & Excellence
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* CEO/Founder Quote */}
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -5 }}
+                >
+                  <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                    <div className="bg-gradient-to-r from-green-500 to-green-600 p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                          <Image
+                            src="/placeholder.svg?height=80&width=80"
+                            alt="CEO & Founder"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="text-white">
+                          <h3 className="text-xl font-bold">
+                            Dr. [Founder Name]
+                          </h3>
+                          <p className="text-sm text-white/90">CEO & Founder</p>
+                          <Badge className="mt-1 bg-white/20 text-white border-0">
+                            Reflex Physiotherapy
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <CardContent className="p-8">
-                  <div className="relative">
-                    <motion.div
-                      className="absolute -top-4 -left-2 text-6xl text-green-500/10 font-serif"
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{
-                        duration: 3,
-                        repeat: Number.POSITIVE_INFINITY,
-                      }}
-                    >
-                      "
-                    </motion.div>
-                    <p className="text-gray-700 text-lg leading-relaxed italic pl-8 mb-4">
-                      When I founded Reflex Physiotherapy, my vision was simple
-                      yet profound: to create a center where advanced
-                      therapeutic techniques meet genuine human compassion. We
-                      don't just treat conditions; we transform lives by
-                      empowering our patients to achieve their fullest
-                      potential.
-                    </p>
-                    <motion.div
-                      className="absolute -bottom-2 right-0 text-6xl text-green-500/10 font-serif"
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{
-                        duration: 3,
-                        repeat: Number.POSITIVE_INFINITY,
-                        delay: 1.5,
-                      }}
-                    >
-                      "
-                    </motion.div>
-                  </div>
-                  <div className="flex items-center gap-2 text-green-600 mt-6 pt-4 border-t border-gray-200">
-                    <Lightbulb className="h-5 w-5" />
-                    <span className="text-sm font-semibold">
-                      Innovation Meets Compassion
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                    <CardContent className="p-8">
+                      <div className="relative">
+                        <motion.div
+                          className="absolute -top-4 -left-2 text-6xl text-green-500/10 font-serif"
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{
+                            duration: 3,
+                            repeat: Number.POSITIVE_INFINITY,
+                          }}
+                        >
+                          "
+                        </motion.div>
+                        <p className="text-gray-700 text-lg leading-relaxed italic pl-8 mb-4">
+                          When I founded Reflex Physiotherapy, my vision was
+                          simple yet profound: to create a center where advanced
+                          therapeutic techniques meet genuine human compassion.
+                          We don't just treat conditions; we transform lives by
+                          empowering our patients to achieve their fullest
+                          potential.
+                        </p>
+                        <motion.div
+                          className="absolute -bottom-2 right-0 text-6xl text-green-500/10 font-serif"
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{
+                            duration: 3,
+                            repeat: Number.POSITIVE_INFINITY,
+                            delay: 1.5,
+                          }}
+                        >
+                          "
+                        </motion.div>
+                      </div>
+                      <div className="flex items-center gap-2 text-green-600 mt-6 pt-4 border-t border-gray-200">
+                        <Lightbulb className="h-5 w-5" />
+                        <span className="text-sm font-semibold">
+                          Innovation Meets Compassion
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </>
+            )}
           </div>
         </div>
       </section>
 
       {/* Company Timeline */}
-      <section className="py-20 bg-gradient-to-r from-[#2e3192]/5 to-purple-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -632,51 +782,105 @@ export default function AboutPage() {
             </p>
           </motion.div>
 
-          <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[#2e3192] to-[#4c46a3] rounded-full"></div>
-
-            <div className="space-y-12">
+          <div className="max-w-5xl mx-auto">
+            <div className="space-y-8">
               {milestones.map((milestone, index) => (
                 <motion.div
                   key={milestone.year + index}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.6 }}
                   viewport={{ once: true }}
-                  className={`flex items-center ${index % 2 === 0 ? "flex-row" : "flex-row-reverse"}`}
+                  whileHover={{ scale: 1.02 }}
+                  className="relative"
                 >
-                  <div
-                    className={`w-1/2 ${index % 2 === 0 ? "pr-8 text-right" : "pl-8 text-left"}`}
-                  >
-                    <motion.div whileHover={{ scale: 1.02 }}>
-                      <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <CardContent className="p-6">
-                          <div className="text-2xl font-bold text-[#2e3192] mb-2">
-                            {milestone.year}
+                  <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                    <div className="flex flex-col md:flex-row">
+                      {/* Year Badge */}
+                      <div className="md:w-48 bg-gradient-to-br from-[#2e3192] to-[#4c46a3] p-6 flex flex-col items-center justify-center text-white">
+                        <motion.div
+                          animate={{
+                            scale: [1, 1.1, 1],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Number.POSITIVE_INFINITY,
+                            delay: index * 0.3,
+                          }}
+                        >
+                          <Calendar className="h-12 w-12 mb-3 opacity-80" />
+                        </motion.div>
+                        <div className="text-4xl font-bold mb-1">
+                          {milestone.year}
+                        </div>
+                        <div className="text-sm text-white/80">
+                          {index === milestones.length - 1
+                            ? "Today"
+                            : "Milestone"}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <CardContent className="flex-1 p-6 md:p-8">
+                        <div className="flex items-start gap-4">
+                          <motion.div
+                            className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#2e3192]/10 to-[#4c46a3]/10 flex items-center justify-center"
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.6 }}
+                          >
+                            <CheckCircle className="h-6 w-6 text-[#2e3192]" />
+                          </motion.div>
+                          <div className="flex-1">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                              {milestone.title}
+                            </h3>
+                            <p className="text-gray-600 leading-relaxed text-lg">
+                              {milestone.description}
+                            </p>
                           </div>
-                          <h3 className="text-xl font-bold text-gray-800 mb-3">
-                            {milestone.title}
-                          </h3>
-                          <p className="text-gray-600 leading-relaxed">
-                            {milestone.description}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  </div>
+                        </div>
+                      </CardContent>
+                    </div>
 
-                  {/* Timeline Dot */}
-                  <motion.div
-                    className="w-6 h-6 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] rounded-full border-4 border-white shadow-lg z-10"
-                    whileHover={{ scale: 1.5 }}
-                    transition={{ duration: 0.3 }}
-                  />
-
-                  <div className="w-1/2"></div>
+                    {/* Progress Indicator */}
+                    {index < milestones.length - 1 && (
+                      <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+                        <motion.div
+                          animate={{
+                            y: [0, 5, 0],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Number.POSITIVE_INFINITY,
+                            ease: "easeInOut",
+                          }}
+                          className="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-[#2e3192]"
+                        >
+                          <div className="w-2 h-2 bg-[#2e3192] rounded-full"></div>
+                        </motion.div>
+                      </div>
+                    )}
+                  </Card>
                 </motion.div>
               ))}
             </div>
+
+            {/* Final Achievement Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="mt-12 text-center"
+            >
+              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white px-8 py-4 rounded-full shadow-xl">
+                <Award className="h-6 w-6" />
+                <span className="text-lg font-bold">
+                  Continuing Our Journey of Excellence
+                </span>
+                <TrendingUp className="h-6 w-6" />
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>

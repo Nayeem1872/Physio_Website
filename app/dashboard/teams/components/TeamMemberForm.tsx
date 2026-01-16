@@ -20,6 +20,7 @@ interface TeamMember {
   availability: string;
   languages: string;
   image: string;
+  order: number;
 }
 
 interface TeamMemberFormProps {
@@ -72,6 +73,7 @@ export interface CreateTeamMemberPayload {
   phone: string;
   availability: string;
   languages: string[];
+  order: number;
 }
 
 export const createTeamMemberAPI = async (
@@ -139,6 +141,7 @@ export default function TeamMemberForm({
     availability: "",
     languages: "",
     image: "",
+    order: 0,
   });
 
   useEffect(() => {
@@ -227,6 +230,7 @@ export default function TeamMemberForm({
         phone: formData.phone,
         availability: formData.availability,
         languages: formData.languages.split(",").map((lang) => lang.trim()),
+        order: formData.order,
       };
 
       if (editingMember) {
@@ -261,6 +265,7 @@ export default function TeamMemberForm({
       availability: "",
       languages: "",
       image: "",
+      order: 0,
     });
     setImagePreview("");
     setCertificationInput("");
@@ -581,6 +586,30 @@ export default function TeamMemberForm({
                 placeholder="Bengali, English"
               />
             </div>
+          </div>
+
+          {/* Order */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Display Order *
+            </label>
+            <input
+              type="number"
+              required
+              value={formData.order}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  order: parseInt(e.target.value) || 0,
+                })
+              }
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
+              placeholder="0"
+              min="0"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Lower numbers appear first (0, 1, 2, etc.)
+            </p>
           </div>
 
           {/* Form Actions */}

@@ -31,6 +31,7 @@ interface TeamMember {
   availability: string;
   languages: string;
   image: string;
+  order: number;
 }
 
 interface TeamMemberCardProps {
@@ -103,6 +104,12 @@ export default function TeamMemberCard({
           fill
           className="object-cover"
         />
+        {/* Order Badge */}
+        <div className="absolute top-4 left-4">
+          <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-bold rounded-full shadow-md border border-gray-200">
+            Order: {member.order}
+          </span>
+        </div>
         <div className="absolute top-4 right-4 flex gap-2">
           <button
             onClick={() => onEdit(member)}
@@ -205,13 +212,16 @@ export default function TeamMemberCard({
                 <h3 className="text-xl font-bold text-gray-900">
                   Delete Team Member
                 </h3>
-                <p className="text-sm text-gray-600">This action cannot be undone</p>
+                <p className="text-sm text-gray-600">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
 
             <p className="text-gray-700 mb-6">
-              Are you sure you want to delete <span className="font-semibold">{member.name}</span>? 
-              This will permanently remove them from your team.
+              Are you sure you want to delete{" "}
+              <span className="font-semibold">{member.name}</span>? This will
+              permanently remove them from your team.
             </p>
 
             <div className="flex gap-3">

@@ -17,6 +17,7 @@ interface TeamMember {
   availability: string;
   languages: string;
   image: string;
+  order: number;
 }
 
 interface TeamMemberResponse {
@@ -34,6 +35,7 @@ interface TeamMemberResponse {
   phone: string;
   availability: string;
   languages: string[];
+  order: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -51,17 +53,18 @@ interface TeamMembersListProps {
 // API - Get all team members
 const API_BASE_URL = "http://localhost:5000/api/team";
 
-export const getAllTeamMembersAPI = async (): Promise<TeamMembersListResponse> => {
-  const response = await fetch(API_BASE_URL, {
-    method: "GET",
-  });
+export const getAllTeamMembersAPI =
+  async (): Promise<TeamMembersListResponse> => {
+    const response = await fetch(API_BASE_URL, {
+      method: "GET",
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch team members");
-  }
+    if (!response.ok) {
+      throw new Error("Failed to fetch team members");
+    }
 
-  return response.json();
-};
+    return response.json();
+  };
 
 // Component
 export default function TeamMembersList({
@@ -94,7 +97,10 @@ export default function TeamMembersList({
         availability: member.availability,
         languages: member.languages.join(", "),
         image: member.profileImage,
+        order: member.order || 0,
       }));
+      // Sort by order
+      members.sort((a, b) => a.order - b.order);
       setTeamMembers(members);
     } catch (error) {
       console.error("Error fetching team members:", error);

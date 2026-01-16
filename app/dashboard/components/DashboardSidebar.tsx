@@ -16,6 +16,7 @@ import {
   LogOut,
   Calendar,
   Image,
+  TrendingUp,
 } from "lucide-react";
 
 interface DashboardSidebarProps {
@@ -58,6 +59,11 @@ const menuItems = [
     name: "Testimonials",
     href: "/dashboard/testimonials",
     icon: MessageSquare,
+  },
+  {
+    name: "Milestones",
+    href: "/dashboard/milestones",
+    icon: TrendingUp,
   },
   {
     name: "FAQ",
