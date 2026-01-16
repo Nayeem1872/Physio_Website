@@ -8,6 +8,7 @@ import TeamSection from "./components/TeamSection";
 import TestimonialSection from "./components/TestimonialSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
+import LeadershipQuoteSection from "./components/LeadershipQuoteSection";
 import { motion } from "framer-motion";
 
 interface Banner {
@@ -45,11 +46,24 @@ interface ContactInfo {
   youtube: string;
 }
 
+interface Leadership {
+  _id: string;
+  name: string;
+  position: string;
+  role: "chairman" | "ceo" | "other";
+  quote: string;
+  image: string;
+  badge: string;
+  order: number;
+  published: boolean;
+}
+
 export default function ReflexPhysiotherapyWebsite() {
   const [heroBanner, setHeroBanner] = useState<Banner | null>(null);
   const [aboutBanner, setAboutBanner] = useState<Banner | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [leadership, setLeadership] = useState<Leadership[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -84,6 +98,23 @@ export default function ReflexPhysiotherapyWebsite() {
           const data = await contactResponse.json();
           setContactInfo(data);
         }
+
+        // Fetch leadership
+        const leadershipResponse = await fetch(
+          "http://localhost:5000/api/leadership"
+        );
+        if (leadershipResponse.ok) {
+          const data = await leadershipResponse.json();
+          if (data.leadership && data.leadership.length > 0) {
+            // Sort by order and filter for chairman and ceo
+            const sortedLeadership = data.leadership
+              .filter(
+                (l: Leadership) => l.role === "chairman" || l.role === "ceo"
+              )
+              .sort((a: Leadership, b: Leadership) => a.order - b.order);
+            setLeadership(sortedLeadership);
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -93,6 +124,10 @@ export default function ReflexPhysiotherapyWebsite() {
 
     fetchData();
   }, []);
+
+  // Get chairman and CEO from leadership
+  const chairman = leadership.find((l) => l.role === "chairman");
+  const ceo = leadership.find((l) => l.role === "ceo");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -109,8 +144,26 @@ export default function ReflexPhysiotherapyWebsite() {
       {/* Services Section */}
       <ServiceSection />
 
+      {/* Chairman Quote - Image Left, Quote Right */}
+      {chairman && (
+        <LeadershipQuoteSection
+          leadership={chairman}
+          imagePosition="left"
+          index={0}
+        />
+      )}
+
       {/* About Section */}
       <AboutSection banner={aboutBanner} isLoading={isLoading} />
+
+      {/* CEO Quote - Image Right, Quote Left */}
+      {ceo && (
+        <LeadershipQuoteSection
+          leadership={ceo}
+          imagePosition="right"
+          index={1}
+        />
+      )}
 
       {/* Team Section */}
       <TeamSection />

@@ -24,6 +24,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 
@@ -87,6 +88,8 @@ export default function AboutPage() {
   ]);
 
   const [leadership, setLeadership] = useState<any[]>([]);
+  const [aboutBanners, setAboutBanners] = useState<string[]>([]);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
   useEffect(() => {
     // Fetch milestones from API
@@ -119,9 +122,45 @@ export default function AboutPage() {
       }
     };
 
+    // Fetch about banner from API
+    const fetchBanner = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/banners?isActive=true"
+        );
+        if (response.ok) {
+          const banners = await response.json();
+          const aboutBannerData = banners.find(
+            (b: any) => b.section === "about"
+          );
+          if (
+            aboutBannerData &&
+            aboutBannerData.images &&
+            aboutBannerData.images.length > 0
+          ) {
+            setAboutBanners(aboutBannerData.images);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching banner:", error);
+      }
+    };
+
     fetchMilestones();
     fetchLeadership();
+    fetchBanner();
   }, []);
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    if (aboutBanners.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentBannerIndex((prev) => (prev + 1) % aboutBanners.length);
+      }, 5000); // Change image every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [aboutBanners]);
 
   const values = [
     {
@@ -249,23 +288,27 @@ export default function AboutPage() {
                 transition={{ delay: 0.7, duration: 0.6 }}
               >
                 <motion.div {...scaleOnHover}>
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#252a7a] hover:to-[#3d3d8a] text-white px-8 py-3"
-                  >
-                    Meet Our Team
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <Link href="/team">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#252a7a] hover:to-[#3d3d8a] text-white px-8 py-3"
+                    >
+                      Meet Our Team
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                 </motion.div>
                 <motion.div {...scaleOnHover}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-[#2e3192] text-[#2e3192] hover:bg-[#2e3192]/5 px-8 py-3 bg-transparent"
-                  >
-                    <Phone className="mr-2 h-4 w-4" />
-                    Contact Us
-                  </Button>
+                  <Link href="/book">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-2 border-[#2e3192] text-[#2e3192] hover:bg-[#2e3192]/5 px-8 py-3 bg-transparent"
+                    >
+                      <Phone className="mr-2 h-4 w-4" />
+                      Contact Us
+                    </Button>
+                  </Link>
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -276,75 +319,112 @@ export default function AboutPage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <motion.div
-                animate={{
-                  y: [0, -10, 0],
-                  rotate: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-                className="relative z-10"
-              >
-                <Image
-                  src="/placeholder.svg?height=600&width=500"
-                  alt="Reflex Physiotherapy Team"
-                  width={500}
-                  height={600}
-                  className="rounded-2xl shadow-2xl"
-                />
-              </motion.div>
+              <div className="relative z-10">
+                {/* Carousel Container */}
+                <div className="relative h-[600px] rounded-2xl overflow-hidden shadow-2xl">
+                  {aboutBanners.length > 0 ? (
+                    <>
+                      {/* Images */}
+                      {aboutBanners.map((banner, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0 }}
+                          animate={{
+                            opacity: currentBannerIndex === index ? 1 : 0,
+                          }}
+                          transition={{ duration: 0.5 }}
+                          className="absolute inset-0"
+                        >
+                          <Image
+                            src={`http://localhost:5000${banner}`}
+                            alt={`Reflex Physiotherapy ${index + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </motion.div>
+                      ))}
+
+                      {/* Navigation Dots */}
+                      {aboutBanners.length > 1 && (
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+                          {aboutBanners.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCurrentBannerIndex(index)}
+                              className={`w-3 h-3 rounded-full transition-all ${
+                                currentBannerIndex === index
+                                  ? "bg-white w-8"
+                                  : "bg-white/50 hover:bg-white/75"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Navigation Arrows */}
+                      {aboutBanners.length > 1 && (
+                        <>
+                          <button
+                            onClick={() =>
+                              setCurrentBannerIndex(
+                                (prev) =>
+                                  (prev - 1 + aboutBanners.length) %
+                                  aboutBanners.length
+                              )
+                            }
+                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all z-10"
+                          >
+                            <svg
+                              className="w-6 h-6 text-gray-800"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 19l-7-7 7-7"
+                              />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() =>
+                              setCurrentBannerIndex(
+                                (prev) => (prev + 1) % aboutBanners.length
+                              )
+                            }
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all z-10"
+                          >
+                            <svg
+                              className="w-6 h-6 text-gray-800"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </button>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <Image
+                      src="/placeholder.svg?height=600&width=500"
+                      alt="Reflex Physiotherapy Team"
+                      fill
+                      className="object-cover"
+                    />
+                  )}
+                </div>
+              </div>
 
               {/* Floating Achievement Badges */}
-              <motion.div
-                className="absolute -top-4 -right-4 bg-white p-4 rounded-xl shadow-lg"
-                animate={{
-                  y: [0, -15, 0],
-                  rotate: [0, 5, 0],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                  delay: 0.5,
-                }}
-              >
-                <div className="flex items-center space-x-2">
-                  <div className="bg-yellow-100 p-2 rounded-lg">
-                    <Award className="h-5 w-5 text-yellow-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">Evidence-Based</p>
-                    <p className="text-xs text-gray-600">Practice</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="absolute -bottom-4 -left-4 bg-white p-4 rounded-xl shadow-lg"
-                animate={{
-                  y: [0, 15, 0],
-                  rotate: [0, -5, 0],
-                }}
-                transition={{
-                  duration: 3.5,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                  delay: 1,
-                }}
-              >
-                <div className="flex items-center space-x-2">
-                  <div className="bg-green-100 p-2 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">Uttara</p>
-                    <p className="text-xs text-gray-600">Community Care</p>
-                  </div>
-                </div>
-              </motion.div>
             </motion.div>
           </div>
         </div>

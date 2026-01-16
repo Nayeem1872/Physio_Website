@@ -4,7 +4,10 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 interface TeamMember {
   _id: string;
@@ -32,7 +35,11 @@ const TeamSection = () => {
       try {
         const response = await fetch("http://localhost:5000/api/team");
         const data = await response.json();
-        setTeamMembers(data.teamMembers || []);
+        // Only show first 3 members, sorted by order
+        const sortedMembers = (data.teamMembers || []).sort(
+          (a: any, b: any) => (a.order || 0) - (b.order || 0)
+        );
+        setTeamMembers(sortedMembers.slice(0, 3));
       } catch (error) {
         console.error("Error fetching team members:", error);
       } finally {
@@ -99,7 +106,7 @@ const TeamSection = () => {
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
           >
             {teamMembers.map((member) => (
               <motion.div
@@ -150,6 +157,25 @@ const TeamSection = () => {
                 </Card>
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* View More Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <Link href="/team">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] hover:from-[#252a7a] hover:to-[#3d3d8a] text-white px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all"
+              >
+                View All Team Members
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </motion.div>
         </div>
       </section>
