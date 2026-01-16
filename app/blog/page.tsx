@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
@@ -7,99 +7,82 @@ import Footer from "../components/Footer";
 import { Calendar, Clock, ArrowRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Blog posts data
-const blogPosts = [
-  {
-    id: 1,
-    slug: "benefits-of-physiotherapy",
-    title: "The Benefits of Regular Physiotherapy Sessions",
-    excerpt:
-      "Discover how consistent physiotherapy can improve your quality of life, reduce pain, and enhance mobility for long-term wellness.",
-    image: "/placeholder.jpg",
-    category: "Wellness",
-    date: "December 15, 2024",
-    readTime: "5 min read",
-    author: "Dr. Sarah Johnson",
-  },
-  {
-    id: 2,
-    slug: "sports-injury-recovery",
-    title: "Sports Injury Recovery: A Complete Guide",
-    excerpt:
-      "Learn about the most effective techniques and exercises for recovering from common sports injuries and getting back to peak performance.",
-    image: "/placeholder.jpg",
-    category: "Sports Medicine",
-    date: "December 10, 2024",
-    readTime: "7 min read",
-    author: "Dr. Michael Chen",
-  },
-  {
-    id: 3,
-    slug: "posture-correction-tips",
-    title: "10 Essential Tips for Better Posture",
-    excerpt:
-      "Poor posture can lead to chronic pain. Here are practical tips to improve your posture and prevent long-term health issues.",
-    image: "/placeholder.jpg",
-    category: "Prevention",
-    date: "December 5, 2024",
-    readTime: "4 min read",
-    author: "Dr. Emily Roberts",
-  },
-  {
-    id: 4,
-    slug: "back-pain-relief",
-    title: "Understanding and Managing Lower Back Pain",
-    excerpt:
-      "Lower back pain affects millions. Learn about the causes, prevention strategies, and effective treatment options available.",
-    image: "/placeholder.jpg",
-    category: "Pain Management",
-    date: "November 28, 2024",
-    readTime: "6 min read",
-    author: "Dr. Sarah Johnson",
-  },
-  {
-    id: 5,
-    slug: "elderly-mobility",
-    title: "Maintaining Mobility in Your Golden Years",
-    excerpt:
-      "Age doesn't have to limit your movement. Discover exercises and techniques to stay active and independent as you age.",
-    image: "/placeholder.jpg",
-    category: "Senior Care",
-    date: "November 20, 2024",
-    readTime: "5 min read",
-    author: "Dr. Michael Chen",
-  },
-  {
-    id: 6,
-    slug: "rehabilitation-exercises",
-    title: "Top 5 Rehabilitation Exercises for Knee Pain",
-    excerpt:
-      "Strengthen your knees and reduce pain with these evidence-based rehabilitation exercises recommended by physiotherapy experts.",
-    image: "/placeholder.jpg",
-    category: "Rehabilitation",
-    date: "November 15, 2024",
-    readTime: "8 min read",
-    author: "Dr. Emily Roberts",
-  },
-];
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+}
 
-const categories = [
-  "All",
-  "Wellness",
-  "Sports Medicine",
-  "Prevention",
-  "Pain Management",
-  "Senior Care",
-  "Rehabilitation",
-];
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  category: Category;
+  author: string;
+  readTime: string;
+  imageUrl: string;
+  excerpt: string;
+  content: string;
+  createdAt: string;
+}
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch blogs
+        const blogsResponse = await fetch("http://localhost:5000/api/blogs");
+        if (blogsResponse.ok) {
+          const blogsData = await blogsResponse.json();
+          setBlogPosts(blogsData.blogs || []);
+        }
+
+        // Fetch categories
+        const categoriesResponse = await fetch(
+          "http://localhost:5000/api/blog-categories"
+        );
+        if (categoriesResponse.ok) {
+          const categoriesData = await categoriesResponse.json();
+          const categoryNames = categoriesData.categories.map(
+            (cat: Category) => cat.name
+          );
+          setCategories(["All", ...categoryNames]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+    return `http://localhost:5000${imagePath}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   const filteredPosts = blogPosts.filter((post) => {
     const matchesCategory =
-      selectedCategory === "All" || post.category === selectedCategory;
+      selectedCategory === "All" || post.category.name === selectedCategory;
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
@@ -148,8 +131,8 @@ export default function BlogPage() {
               Physiotherapy <span className="text-[#2e3192]">Insights</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Expert advice, tips, and insights on physiotherapy,
-              rehabilitation, and wellness
+              Expert advice, tips, and insights from Reflex Physiotherapy &
+              Rehab Center
             </p>
 
             {/* Search Bar */}
@@ -198,73 +181,84 @@ export default function BlogPage() {
       {/* Blog Posts Grid */}
       <section className="py-12 px-4">
         <div className="container mx-auto">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {filteredPosts.map((post) => (
-              <motion.article
-                key={post.id}
-                variants={itemVariants}
-                whileHover={{ y: -10 }}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
-              >
-                <Link href={`/blog/${post.slug}`}>
-                  <div className="relative h-48 overflow-hidden">
-                    <motion.img
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.3 }}
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-[#2e3192] text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {post.category}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {post.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {post.readTime}
-                      </span>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl h-96 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {filteredPosts.map((post) => (
+                <motion.article
+                  key={post._id}
+                  variants={itemVariants}
+                  whileHover={{ y: -10 }}
+                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+                >
+                  <Link href={`/blog/${post.slug}`}>
+                    <div className="relative h-48 overflow-hidden">
+                      <motion.img
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.3 }}
+                        src={getImageUrl(post.imageUrl)}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-[#2e3192] text-white px-3 py-1 rounded-full text-sm font-medium">
+                          {post.category.name}
+                        </span>
+                      </div>
                     </div>
 
-                    <h2 className="text-xl font-bold text-gray-900 mb-3 hover:text-[#2e3192] transition-colors">
-                      {post.title}
-                    </h2>
+                    <div className="p-6">
+                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {formatDate(post.createdAt)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {post.readTime}
+                        </span>
+                      </div>
 
-                    <p className="text-gray-600 mb-4 line-clamp-3">
-                      {post.excerpt}
-                    </p>
+                      <h2 className="text-xl font-bold text-gray-900 mb-3 hover:text-[#2e3192] transition-colors">
+                        {post.title}
+                      </h2>
 
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">
-                        {post.author}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        className="text-[#2e3192] hover:text-[#4c46a3] p-0"
-                      >
-                        Read More <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
+                      <p className="text-gray-600 mb-4 line-clamp-3">
+                        {post.excerpt}
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500">
+                          {post.author}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          className="text-[#2e3192] hover:text-[#4c46a3] p-0"
+                        >
+                          Read More <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
-          </motion.div>
+                  </Link>
+                </motion.article>
+              ))}
+            </motion.div>
+          )}
 
-          {filteredPosts.length === 0 && (
+          {!isLoading && filteredPosts.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

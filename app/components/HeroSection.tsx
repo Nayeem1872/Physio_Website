@@ -130,45 +130,6 @@ const HeroSection = ({ banner, isLoading }: HeroSectionProps) => {
                   </Link>
                 </motion.div>
               </motion.div>
-
-              <motion.div
-                className="flex items-center space-x-6 pt-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.9, duration: 0.6 }}
-              >
-                <div className="flex items-center space-x-2">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <motion.div
-                        key={i}
-                        className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-green-400 border-2 border-white"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.9 + i * 0.1 }}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-gray-600">
-                    Trusted by Uttara Community
-                  </span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 1.2 + i * 0.1 }}
-                    >
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    </motion.div>
-                  ))}
-                  <span className="text-sm text-gray-600 ml-2">
-                    Excellence in Care
-                  </span>
-                </div>
-              </motion.div>
             </motion.div>
 
             <motion.div
