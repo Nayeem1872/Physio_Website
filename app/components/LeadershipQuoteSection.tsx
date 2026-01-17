@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Quote, Award, Lightbulb } from "lucide-react";
 import { BACKEND_URL } from "@/lib/config";
+import { useMemo } from "react";
 
 interface Leadership {
   _id: string;
@@ -27,9 +28,37 @@ export default function LeadershipQuoteSection({
   imagePosition,
 }: LeadershipQuoteSectionProps) {
   const isChairman = leadership.role === "chairman";
-  const gradientColor = isChairman
-    ? "from-[#2e3192] to-[#4c46a3]"
-    : "from-green-500 to-green-600";
+  
+  // Memoize computed values
+  const gradientColor = useMemo(() => 
+    isChairman ? "from-[#2e3192] to-[#4c46a3]" : "from-green-500 to-green-600",
+    [isChairman]
+  );
+
+  const displayPosition = useMemo(() => 
+    isChairman ? "Chairman" : leadership.position,
+    [isChairman, leadership.position]
+  );
+
+  const badgeText = useMemo(() => 
+    isChairman ? "Leadership Vision" : "Founder's Message",
+    [isChairman]
+  );
+
+  const iconColor = useMemo(() => 
+    isChairman ? "text-[#2e3192]" : "text-green-500",
+    [isChairman]
+  );
+
+  const textColor = useMemo(() => 
+    isChairman ? "text-[#2e3192]" : "text-green-600",
+    [isChairman]
+  );
+
+  const taglineText = useMemo(() => 
+    isChairman ? "Leading with Vision & Excellence" : "Innovation Meets Compassion",
+    [isChairman]
+  );
 
   return (
     <section className="py-8 px-4 overflow-hidden">
@@ -141,17 +170,13 @@ export default function LeadershipQuoteSection({
                 <span
                   className={`inline-block px-3 py-1.5 rounded-full bg-gradient-to-r ${gradientColor} text-white text-xs font-semibold mb-2`}
                 >
-                  {isChairman ? "Leadership Vision" : "Founder's Message"}
+                  {badgeText}
                 </span>
                 <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
                   {leadership.name}
                 </h2>
-                <p
-                  className={`text-lg font-semibold ${
-                    isChairman ? "text-[#2e3192]" : "text-green-600"
-                  }`}
-                >
-                  {isChairman ? "Chairman" : leadership.position}
+                <p className={`text-lg font-semibold ${textColor}`}>
+                  {displayPosition}
                 </p>
               </motion.div>
 
@@ -164,9 +189,7 @@ export default function LeadershipQuoteSection({
                 className="relative"
               >
                 <Quote
-                  className={`absolute -top-3 -left-2 h-12 w-12 ${
-                    isChairman ? "text-[#2e3192]" : "text-green-500"
-                  } opacity-20`}
+                  className={`absolute -top-3 -left-2 h-12 w-12 ${iconColor} opacity-20`}
                 />
 
                 <blockquote className="relative pl-6 space-y-2">
@@ -176,9 +199,7 @@ export default function LeadershipQuoteSection({
                 </blockquote>
 
                 <Quote
-                  className={`absolute -bottom-3 -right-2 h-12 w-12 ${
-                    isChairman ? "text-[#2e3192]" : "text-green-500"
-                  } opacity-20 rotate-180`}
+                  className={`absolute -bottom-3 -right-2 h-12 w-12 ${iconColor} opacity-20 rotate-180`}
                 />
               </motion.div>
 
@@ -200,19 +221,17 @@ export default function LeadershipQuoteSection({
                 className="flex items-center gap-2 pt-1"
               >
                 <div
-                  className={`flex items-center gap-2 text-xs ${
-                    isChairman ? "text-[#2e3192]" : "text-green-600"
-                  } font-semibold`}
+                  className={`flex items-center gap-2 text-xs ${textColor} font-semibold`}
                 >
                   {isChairman ? (
                     <>
                       <Award className="h-4 w-4" />
-                      <span>Leading with Vision & Excellence</span>
+                      <span>{taglineText}</span>
                     </>
                   ) : (
                     <>
                       <Lightbulb className="h-4 w-4" />
-                      <span>Innovation Meets Compassion</span>
+                      <span>{taglineText}</span>
                     </>
                   )}
                 </div>

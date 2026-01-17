@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,39 +31,50 @@ const TeamSection = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchTeamMembers = async () => {
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/team`);
-        const data = await response.json();
-        // Only show first 3 members, sorted by order
-        const sortedMembers = (data.teamMembers || []).sort(
-          (a: any, b: any) => (a.order || 0) - (b.order || 0)
-        );
-        setTeamMembers(sortedMembers.slice(0, 3));
-      } catch (error) {
-        console.error("Error fetching team members:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTeamMembers();
-  }, []);
-
-  const fadeInUp = {
+  // Memoize animation variants
+  const fadeInUp = useMemo(() => ({
     initial: { opacity: 0, y: 60 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.6 },
-  };
+  }), []);
 
-  const staggerContainer = {
+  const staggerContainer = useMemo(() => ({
     animate: {
       transition: {
         staggerChildren: 0.1,
       },
     },
-  };
+  }), []);
+
+  // Optimized fetch function
+  const fetchTeamMembers = useCallback(async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/team`, {
+        next: { revalidate: 3600 }, // Cache for 1 hour
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      // Only show first 3 members, sorted by order
+      const sortedMembers = (data.teamMembers || [])
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+        .slice(0, 3);
+      
+      setTeamMembers(sortedMembers);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      setTeamMembers([]); // Set empty array on error
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTeamMembers();
+  }, [fetchTeamMembers]);
 
   if (loading) {
     return (
