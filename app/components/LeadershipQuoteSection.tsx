@@ -32,14 +32,14 @@ export default function LeadershipQuoteSection({
     : "from-green-500 to-green-600";
 
   return (
-    <section className="py-12 px-4 overflow-hidden">
+    <section className="py-8 px-4 overflow-hidden">
       <div className="container mx-auto max-w-[1400px]">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className={`flex flex-col lg:flex-row gap-8 items-center ${
+          className={`flex flex-col lg:flex-row gap-6 items-stretch ${
             imagePosition === "right" ? "lg:flex-row-reverse" : ""
           }`}
         >
@@ -49,7 +49,7 @@ export default function LeadershipQuoteSection({
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="w-full lg:w-[30%] flex-shrink-0"
+            className="w-full lg:w-[30%] flex-shrink-0 flex items-center justify-center"
           >
             <div className="relative max-w-xs mx-auto">
               {/* Decorative Background */}
@@ -71,13 +71,17 @@ export default function LeadershipQuoteSection({
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
-                  className={`relative w-64 h-64 mx-auto rounded-full overflow-hidden shadow-2xl bg-gradient-to-br ${gradientColor} border-4 border-white`}
+                  className={`relative w-56 h-56 mx-auto rounded-full overflow-hidden shadow-2xl bg-gradient-to-br ${gradientColor} border-4 border-white`}
                 >
                   <Image
                     src={`${BACKEND_URL}${leadership.image}`}
                     alt={leadership.name}
                     fill
                     className="object-cover"
+                    style={{
+                      objectFit: 'cover',
+                      objectPosition: 'center top'
+                    }}
                   />
 
                   {/* Overlay Gradient */}
@@ -124,9 +128,9 @@ export default function LeadershipQuoteSection({
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
-            className="w-full lg:w-[70%]"
+            className="w-full lg:w-[70%] flex items-center"
           >
-            <div className="space-y-4">
+            <div className="space-y-3 w-full">
               {/* Title */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -135,11 +139,11 @@ export default function LeadershipQuoteSection({
                 viewport={{ once: true }}
               >
                 <span
-                  className={`inline-block px-3 py-1.5 rounded-full bg-gradient-to-r ${gradientColor} text-white text-xs font-semibold mb-3`}
+                  className={`inline-block px-3 py-1.5 rounded-full bg-gradient-to-r ${gradientColor} text-white text-xs font-semibold mb-2`}
                 >
                   {isChairman ? "Leadership Vision" : "Founder's Message"}
                 </span>
-                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-1">
+                <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
                   {leadership.name}
                 </h2>
                 <p
@@ -147,7 +151,7 @@ export default function LeadershipQuoteSection({
                     isChairman ? "text-[#2e3192]" : "text-green-600"
                   }`}
                 >
-                  {leadership.position}
+                  {isChairman ? "Chairman" : leadership.position}
                 </p>
               </motion.div>
 
@@ -165,8 +169,8 @@ export default function LeadershipQuoteSection({
                   } opacity-20`}
                 />
 
-                <blockquote className="relative pl-6 space-y-3">
-                  <p className="text-lg lg:text-xl text-gray-700 leading-relaxed italic">
+                <blockquote className="relative pl-6 space-y-2">
+                  <p className="text-base lg:text-lg text-gray-700 leading-relaxed italic">
                     "{leadership.quote}"
                   </p>
                 </blockquote>
@@ -193,7 +197,7 @@ export default function LeadershipQuoteSection({
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 1.2 }}
                 viewport={{ once: true }}
-                className="flex items-center gap-2 pt-2"
+                className="flex items-center gap-2 pt-1"
               >
                 <div
                   className={`flex items-center gap-2 text-xs ${
