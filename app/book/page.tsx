@@ -44,10 +44,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-import { bookAppointment } from "./actions";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { BACKEND_URL } from "@/lib/config";
 import { useContactInfo } from "../hooks/useContactInfo";
 
 const formSchema = z.object({
@@ -141,7 +141,12 @@ export default function BookingPage() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      const result = await bookAppointment(data);
+      const response = await fetch(`${BACKEND_URL}/api/appointments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
       setSubmissionResult(result);
       if (result.success) {
         setStep(4); // Move to success step

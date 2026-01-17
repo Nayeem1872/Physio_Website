@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BACKEND_URL } from "@/lib/config";
 
 export interface ContactInfo {
   _id: string;
@@ -24,7 +25,7 @@ export const useContactInfo = () => {
     const fetchContactInfo = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/contact-info");
+        const response = await fetch(`${BACKEND_URL}/api/contact-info`);
         
         if (!response.ok) {
           throw new Error("Failed to fetch contact info");

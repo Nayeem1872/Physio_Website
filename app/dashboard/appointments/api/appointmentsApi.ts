@@ -1,4 +1,5 @@
 // Appointments API utility functions
+import { BACKEND_URL } from "@/lib/config";
 
 export interface Appointment {
   _id: string;
@@ -54,7 +55,7 @@ export const getAllAppointmentsAPI = async (
     params.append("urgency", urgency);
   }
 
-  const url = `/api/appointments${params.toString() ? `?${params.toString()}` : ""}`;
+  const url = `${BACKEND_URL}/api/appointments${params.toString() ? `?${params.toString()}` : ""}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -70,7 +71,7 @@ export const getAllAppointmentsAPI = async (
 
 // Get a single appointment
 export const getAppointmentByIdAPI = async (id: string): Promise<Appointment> => {
-  const response = await fetch(`/api/appointments/${id}`, {
+  const response = await fetch(`${BACKEND_URL}/api/appointments/${id}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -87,7 +88,7 @@ export const updateAppointmentAPI = async (
   id: string,
   payload: Partial<Appointment>
 ): Promise<Appointment> => {
-  const response = await fetch(`/api/appointments/${id}`, {
+  const response = await fetch(`${BACKEND_URL}/api/appointments/${id}`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
@@ -103,7 +104,7 @@ export const updateAppointmentAPI = async (
 
 // Delete an appointment
 export const deleteAppointmentAPI = async (id: string): Promise<any> => {
-  const response = await fetch(`/api/appointments/${id}`, {
+  const response = await fetch(`${BACKEND_URL}/api/appointments/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });

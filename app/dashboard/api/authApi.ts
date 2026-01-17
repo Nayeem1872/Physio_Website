@@ -1,4 +1,5 @@
 // Auth API utility functions
+import { BACKEND_URL } from "@/lib/config";
 
 export interface User {
   id: string;
@@ -17,7 +18,7 @@ const getAuthHeaders = () => {
 
 // Get logged-in user information
 export const getUserInfoAPI = async (): Promise<User> => {
-  const response = await fetch("/api/auth/me", {
+  const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
     method: "GET",
     headers: getAuthHeaders(),
   });

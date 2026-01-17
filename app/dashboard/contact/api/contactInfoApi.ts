@@ -1,4 +1,5 @@
 // Contact Info API utility functions
+import { BACKEND_URL } from "@/lib/config";
 
 export interface ContactInfo {
   _id?: string;
@@ -37,7 +38,7 @@ const getAuthHeaders = () => {
 
 // Get contact info
 export const getContactInfoAPI = async (): Promise<ContactInfo> => {
-  const response = await fetch("/api/contact-info", {
+  const response = await fetch(`${BACKEND_URL}/api/contact-info`, {
     method: "GET",
   });
 
@@ -52,7 +53,7 @@ export const getContactInfoAPI = async (): Promise<ContactInfo> => {
 export const updateContactInfoAPI = async (
   payload: ContactInfoPayload
 ): Promise<ContactInfo> => {
-  const response = await fetch("/api/contact-info", {
+  const response = await fetch(`${BACKEND_URL}/api/contact-info`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),

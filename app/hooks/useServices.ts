@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BACKEND_URL } from "@/lib/config";
 
 export interface ServiceCategory {
   _id: string;
@@ -41,8 +42,8 @@ export const useServices = (categoryId?: string) => {
       try {
         setIsLoading(true);
         const url = categoryId
-          ? `/api/services?category=${categoryId}`
-          : "/api/services";
+          ? `${BACKEND_URL}/api/services?category=${categoryId}`
+          : `${BACKEND_URL}/api/services`;
         
         const response = await fetch(url);
         

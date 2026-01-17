@@ -1,4 +1,5 @@
 // Services API utility functions
+import { BACKEND_URL } from "@/lib/config";
 
 export interface Service {
   _id: string;
@@ -57,7 +58,7 @@ export const getAllServicesAPI = async (
     params.append("all", "true");
   }
 
-  const url = `/api/services${params.toString() ? `?${params.toString()}` : ""}`;
+  const url = `${BACKEND_URL}/api/services${params.toString() ? `?${params.toString()}` : ""}`;
   
   const headers: HeadersInit = {};
   if (includeUnpublished) {
@@ -81,7 +82,7 @@ export const getAllServicesAPI = async (
 
 // Get a single service
 export const getServiceByIdAPI = async (id: string): Promise<Service> => {
-  const response = await fetch(`/api/services/${id}`, {
+  const response = await fetch(`${BACKEND_URL}/api/services/${id}`, {
     method: "GET",
   });
 
@@ -96,7 +97,7 @@ export const getServiceByIdAPI = async (id: string): Promise<Service> => {
 export const createServiceAPI = async (
   payload: CreateServicePayload
 ): Promise<Service> => {
-  const response = await fetch("/api/services", {
+  const response = await fetch(`${BACKEND_URL}/api/services`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
@@ -115,7 +116,7 @@ export const updateServiceAPI = async (
   id: string,
   payload: Partial<CreateServicePayload>
 ): Promise<Service> => {
-  const response = await fetch(`/api/services/${id}`, {
+  const response = await fetch(`${BACKEND_URL}/api/services/${id}`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
@@ -131,7 +132,7 @@ export const updateServiceAPI = async (
 
 // Delete a service
 export const deleteServiceAPI = async (id: string): Promise<any> => {
-  const response = await fetch(`/api/services/${id}`, {
+  const response = await fetch(`${BACKEND_URL}/api/services/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });

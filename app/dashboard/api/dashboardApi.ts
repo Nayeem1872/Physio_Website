@@ -1,4 +1,5 @@
 // Dashboard API utility functions
+import { BACKEND_URL } from "@/lib/config";
 
 export interface DashboardStats {
   appointments: {
@@ -92,7 +93,7 @@ const getAuthHeaders = () => {
 
 // Get dashboard statistics
 export const getDashboardStatsAPI = async (): Promise<DashboardStats> => {
-  const response = await fetch("/api/dashboard/stats", {
+  const response = await fetch(`${BACKEND_URL}/api/dashboard/stats`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -106,7 +107,7 @@ export const getDashboardStatsAPI = async (): Promise<DashboardStats> => {
 
 // Get dashboard overview
 export const getDashboardOverviewAPI = async (): Promise<DashboardOverview> => {
-  const response = await fetch("/api/dashboard/overview", {
+  const response = await fetch(`${BACKEND_URL}/api/dashboard/overview`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
