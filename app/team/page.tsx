@@ -404,7 +404,7 @@ export default function TeamPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
               Why Choose Us
             </Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">

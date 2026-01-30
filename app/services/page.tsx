@@ -299,11 +299,10 @@ export default function ServicesPage() {
                 <div className="flex flex-wrap gap-3 justify-center">
                   <button
                     onClick={() => setActiveCategory("all")}
-                    className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                      activeCategory === "all"
+                    className={`px-6 py-3 rounded-xl font-medium transition-all ${activeCategory === "all"
                         ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
                         : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-                    }`}
+                      }`}
                   >
                     All Services
                   </button>
@@ -313,11 +312,10 @@ export default function ServicesPage() {
                       <button
                         key={category._id}
                         onClick={() => setActiveCategory(category._id)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
-                          activeCategory === category._id
+                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeCategory === category._id
                             ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
                             : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-                        }`}
+                          }`}
                       >
                         <IconComponent className="h-5 w-5" />
                         {category.name}
@@ -420,7 +418,7 @@ export default function ServicesPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
               Why Choose Reflex
             </Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
@@ -501,7 +499,7 @@ export default function ServicesPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">FAQ</Badge>
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">FAQ</Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
               Frequently Asked Questions
             </h2>

@@ -131,7 +131,7 @@ export default function TestimonialsPage() {
             variants={fadeInUp}
             className="text-center max-w-3xl mx-auto"
           >
-            <Badge className="bg-[#2e3192] text-white mb-4">
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
               Patient Stories
             </Badge>
             <h1 className="text-5xl font-bold text-gray-900 mb-6">

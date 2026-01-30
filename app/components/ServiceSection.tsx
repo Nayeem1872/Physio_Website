@@ -76,7 +76,7 @@ const ServiceSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <Badge className="bg-white text-[#2e3192] border-blue-100 shadow-sm mb-4 py-1 px-4">Our Expertise</Badge>
+          <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">Our Expertise</Badge>
           <h2 className="text-4xl lg:text-5xl font-extrabold text-[#1a1c3d] mb-6">
             Comprehensive Rehabilitation
           </h2>

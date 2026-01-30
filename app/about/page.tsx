@@ -352,11 +352,10 @@ export default function AboutPage() {
                             <button
                               key={index}
                               onClick={() => setCurrentBannerIndex(index)}
-                              className={`w-3 h-3 rounded-full transition-all ${
-                                currentBannerIndex === index
+                              className={`w-3 h-3 rounded-full transition-all ${currentBannerIndex === index
                                   ? "bg-white w-8"
                                   : "bg-white/50 hover:bg-white/75"
-                              }`}
+                                }`}
                             />
                           ))}
                         </div>
@@ -441,7 +440,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
               Our Foundation
             </Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
@@ -572,7 +571,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
               Leadership Insights
             </Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
@@ -635,11 +634,10 @@ export default function AboutPage() {
                       <CardContent className="p-8">
                         <div className="relative">
                           <motion.div
-                            className={`absolute -top-4 -left-2 text-6xl ${
-                              leader.role === "chairman"
+                            className={`absolute -top-4 -left-2 text-6xl ${leader.role === "chairman"
                                 ? "text-[#2e3192]/10"
                                 : "text-green-500/10"
-                            } font-serif`}
+                              } font-serif`}
                             animate={{ scale: [1, 1.1, 1] }}
                             transition={{
                               duration: 3,
@@ -652,11 +650,10 @@ export default function AboutPage() {
                             {leader.quote}
                           </p>
                           <motion.div
-                            className={`absolute -bottom-2 right-0 text-6xl ${
-                              leader.role === "chairman"
+                            className={`absolute -bottom-2 right-0 text-6xl ${leader.role === "chairman"
                                 ? "text-[#2e3192]/10"
                                 : "text-green-500/10"
-                            } font-serif`}
+                              } font-serif`}
                             animate={{ scale: [1, 1.1, 1] }}
                             transition={{
                               duration: 3,
@@ -668,11 +665,10 @@ export default function AboutPage() {
                           </motion.div>
                         </div>
                         <div
-                          className={`flex items-center gap-2 ${
-                            leader.role === "chairman"
+                          className={`flex items-center gap-2 ${leader.role === "chairman"
                               ? "text-[#2e3192]"
                               : "text-green-600"
-                          } mt-6 pt-4 border-t border-gray-200`}
+                            } mt-6 pt-4 border-t border-gray-200`}
                         >
                           {leader.role === "chairman" ? (
                             <Award className="h-5 w-5" />
@@ -851,7 +847,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
               Our Journey
             </Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
@@ -976,7 +972,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192]/10 text-[#2e3192] mb-4">
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
               Our Impact
             </Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
