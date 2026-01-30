@@ -52,17 +52,17 @@ const TeamSection = () => {
       const response = await fetch(`${BACKEND_URL}/api/team`, {
         next: { revalidate: 3600 }, // Cache for 1 hour
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      
+
       const data = await response.json();
       // Only show first 3 members, sorted by order
       const sortedMembers = (data.teamMembers || [])
         .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
         .slice(0, 3);
-      
+
       setTeamMembers(sortedMembers);
     } catch (error) {
       console.error("Error fetching team members:", error);
@@ -125,9 +125,9 @@ const TeamSection = () => {
                 key={member._id}
                 variants={fadeInUp}
                 whileHover={{ y: -10 }}
-                className="group"
+                className="group h-full"
               >
-                <Card className="border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
                   <div className="relative">
                     <motion.div
                       whileHover={{ scale: 1.1 }}
@@ -147,7 +147,7 @@ const TeamSection = () => {
                       whileHover={{ opacity: 1 }}
                     />
                   </div>
-                  <CardContent className="p-6">
+                  <CardContent className="p-6 flex-grow">
                     <h3 className="text-xl font-bold text-gray-800 mb-2">
                       {member.fullName}
                     </h3>

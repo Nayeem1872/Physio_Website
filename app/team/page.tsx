@@ -228,7 +228,7 @@ export default function TeamPage() {
               {teamMembers.map((member, index) => {
                 const IconComponent =
                   iconMap[
-                    Object.keys(iconMap)[index % Object.keys(iconMap).length]
+                  Object.keys(iconMap)[index % Object.keys(iconMap).length]
                   ] || Hand;
 
                 return (
@@ -236,10 +236,10 @@ export default function TeamPage() {
                     key={member._id}
                     variants={fadeInUp}
                     whileHover={{ y: -10 }}
-                    className="group"
+                    className="group h-full"
                   >
-                    <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                      <div className="grid md:grid-cols-5 gap-0">
+                    <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
+                      <div className="grid md:grid-cols-5 gap-0 h-full">
                         {/* Image Section */}
                         <div className="md:col-span-2 relative">
                           <motion.div
