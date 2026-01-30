@@ -178,37 +178,8 @@ const HeroSection = ({ banner, isLoading, contactInfo }: HeroSectionProps) => {
                 </motion.div>
               </motion.div>
 
-              {/* Trust badges */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="flex flex-wrap items-center gap-6 pt-4 border-t border-gray-100"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 overflow-hidden">
-                        <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="Patient" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-sm">
-                    <p className="font-bold text-gray-900">5k+ Patients</p>
-                    <p className="text-gray-500">Trusted our care</p>
-                  </div>
-                </div>
-                <div className="h-10 w-[1px] bg-gray-200 hidden sm:block" />
-                <div className="flex items-center gap-2">
-                  <div className="bg-yellow-50 p-2 rounded-lg">
-                    <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                  </div>
-                  <div className="text-sm">
-                    <p className="font-bold text-gray-900">4.9/5 Rating</p>
-                    <p className="text-gray-500">Google reviews</p>
-                  </div>
-                </div>
-              </motion.div>
+
+
             </motion.div>
 
             <motion.div
