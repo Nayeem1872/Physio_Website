@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Play, Filter } from "lucide-react";
 import { BACKEND_URL } from "@/lib/config";
+import VideoGallerySection from "../components/VideoGallerySection";
 
 interface Testimonial {
   _id: string;
@@ -37,7 +38,9 @@ export default function TestimonialsPage() {
         const response = await fetch(`${BACKEND_URL}/api/testimonials`);
         if (response.ok) {
           const data = await response.json();
-          setTestimonials(data.testimonials || []);
+          const allTestimonials = data.testimonials || [];
+          // Filter out testimonials that are intended for the video gallery
+          setTestimonials(allTestimonials.filter((t: Testimonial) => t.bannerMediaType !== "video"));
         }
       } catch (error) {
         console.error("Failed to fetch testimonials:", error);
@@ -141,6 +144,7 @@ export default function TestimonialsPage() {
           </motion.div>
         </div>
       </section>
+
 
       {/* Filter Section */}
       <section className="py-8 px-4">

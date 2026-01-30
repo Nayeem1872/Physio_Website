@@ -20,6 +20,9 @@ const TestimonialSection = dynamic(() => import("./components/TestimonialSection
 const ContactSection = dynamic(() => import("./components/ContactSection"), {
   loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
 });
+const VideoGallerySection = dynamic(() => import("./components/VideoGallerySection"), {
+  loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
+});
 const Footer = dynamic(() => import("./components/Footer"));
 
 // Keep critical above-the-fold components as regular imports
@@ -195,12 +198,15 @@ export default function ReflexPhysiotherapyWebsite() {
           index={1}
         />
       )}
-
+      {/* Video Gallery Section */}
+      <VideoGallerySection />
       {/* Team Section */}
       <TeamSection />
 
       {/* Testimonials Section */}
       <TestimonialSection testimonials={testimonials} isLoading={isLoading} />
+
+
 
       {/* Contact Section */}
       <ContactSection />

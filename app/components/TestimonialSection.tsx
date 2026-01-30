@@ -19,6 +19,8 @@ interface Testimonial {
   _id: string;
   profileMedia: string;
   mediaType: string;
+  bannerMedia?: string;
+  bannerMediaType?: string;
   fullName: string;
   role: string;
   rating: number;
@@ -34,9 +36,12 @@ interface TestimonialSectionProps {
 }
 
 const TestimonialSection = ({
-  testimonials,
+  testimonials: allTestimonials,
   isLoading,
 }: TestimonialSectionProps) => {
+  // Filter out testimonials that are intended for the video gallery
+  const testimonials = allTestimonials.filter(t => t.bannerMediaType !== "video");
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const getMediaUrl = (mediaPath: string) => {
@@ -55,6 +60,7 @@ const TestimonialSection = ({
       (prev) => (prev - 1 + testimonials.length) % testimonials.length
     );
   };
+  console.log("testimonials", testimonials);
 
   // Show loading state
   if (isLoading) {
@@ -127,35 +133,47 @@ const TestimonialSection = ({
                 <Card className="border-0 shadow-2xl overflow-hidden">
                   <CardContent className="p-0">
                     <div className="grid md:grid-cols-2 gap-0">
-                      {/* Left Side - Logo & Patient Info */}
-                      <div className="relative h-[350px] bg-white flex flex-col items-center justify-start p-8 pt-12">
-                        {/* Reflex Logo */}
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.05, 1],
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                          className="mb-auto"
-                        >
-                          <img
-                            src="/images/logo3.png"
-                            alt="Reflex Physiotherapy"
-                            className="w-48 h-auto object-contain"
-                          />
-                        </motion.div>
+                      {/* Left Side - Banner Media / Logo & Patient Info */}
+                      <div className="relative h-[450px] md:h-auto min-h-[400px] bg-white flex flex-col items-center justify-start overflow-hidden">
+                        {currentTestimonial.bannerMedia && currentTestimonial.bannerMediaType === "image" ? (
+                          <div className="absolute inset-0 w-full h-full">
+                            <img
+                              src={getMediaUrl(currentTestimonial.bannerMedia)}
+                              alt="Testimonial Banner"
+                              className="w-full h-full object-contain bg-gray-50"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-start p-8 pt-12 bg-white relative">
+                            {/* Reflex Logo */}
+                            <motion.div
+                              animate={{
+                                scale: [1, 1.05, 1],
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                              className="mb-auto z-10"
+                            >
+                              <img
+                                src="/images/logo3.png"
+                                alt="Reflex Physiotherapy"
+                                className="w-48 h-auto object-contain"
+                              />
+                            </motion.div>
 
-                        {/* Decorative Elements */}
-                        <div className="absolute top-8 left-8 w-20 h-20 border-2 border-[#2e3192]/10 rounded-full"></div>
-                        <div className="absolute bottom-32 right-8 w-16 h-16 border-2 border-[#4c46a3]/10 rounded-full"></div>
-                        <div className="absolute top-1/3 right-12 w-12 h-12 border-2 border-[#2e3192]/10 rounded-full"></div>
+                            {/* Decorative Elements */}
+                            <div className="absolute top-8 left-8 w-20 h-20 border-2 border-[#2e3192]/10 rounded-full"></div>
+                            <div className="absolute bottom-32 right-8 w-16 h-16 border-2 border-[#4c46a3]/10 rounded-full"></div>
+                            <div className="absolute top-1/3 right-12 w-12 h-12 border-2 border-[#2e3192]/10 rounded-full"></div>
+                          </div>
+                        )}
 
-                        {/* Patient Info Card */}
-                        <div className="absolute bottom-6 left-6 right-6">
-                          <div className="bg-gradient-to-r from-[#2e3192] to-[#4c46a3] rounded-xl p-4 shadow-lg">
+                        {/* Patient Info Card - Overlay */}
+                        <div className="absolute bottom-6 left-6 right-6 z-20">
+                          <div className="bg-gradient-to-r from-[#2e3192]/95 to-[#4c46a3]/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/10">
                             <div className="flex items-center space-x-4">
                               <img
                                 src={getMediaUrl(
@@ -220,11 +238,10 @@ const TestimonialSection = ({
                               <button
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
-                                className={`h-2 rounded-full transition-all duration-300 ${
-                                  index === currentIndex
-                                    ? "w-8 bg-[#2e3192]"
-                                    : "w-2 bg-gray-300"
-                                }`}
+                                className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
+                                  ? "w-8 bg-[#2e3192]"
+                                  : "w-2 bg-gray-300"
+                                  }`}
                               />
                             ))}
                           </div>
