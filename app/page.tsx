@@ -119,10 +119,9 @@ export default function ReflexPhysiotherapyWebsite() {
           fetchWithRetry(apiEndpoints.contact),
           fetchWithRetry(apiEndpoints.leadership),
         ]);
-
         // Process banners
         if (bannersData.status === 'fulfilled') {
-          const banners: Banner[] = bannersData.value;
+          const banners: Banner[] = bannersData.value.banners || [];
           setHeroBanner(banners.find((b) => b.section === "hero") || null);
           setAboutBanner(banners.find((b) => b.section === "about") || null);
         }
@@ -140,8 +139,8 @@ export default function ReflexPhysiotherapyWebsite() {
         // Process leadership
         if (leadershipData.status === 'fulfilled') {
           const data = leadershipData.value;
-          if (data.leadership?.length > 0) {
-            const sortedLeadership = data.leadership
+          if (data.leaders?.length > 0) {
+            const sortedLeadership = data.leaders
               .filter((l: Leadership) => l.role === "chairman" || l.role === "ceo")
               .sort((a: Leadership, b: Leadership) => a.order - b.order);
             setLeadership(sortedLeadership);
