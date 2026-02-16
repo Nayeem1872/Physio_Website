@@ -27,6 +27,22 @@ import { useServices } from "../hooks/useServices";
 const ServiceSection = () => {
   const { services, isLoading } = useServices();
 
+  // Debug: Log all services data
+  React.useEffect(() => {
+    console.log("=== SERVICE SECTION DEBUG ===");
+    console.log("Total services:", services.length);
+    console.log("Services data:", services);
+
+    services.forEach((service, index) => {
+      console.log(`Service ${index + 1}:`, {
+        name: service.name,
+        imageUrl: service.imageUrl,
+        hasImage: !!service.imageUrl,
+        imageType: typeof service.imageUrl,
+      });
+    });
+  }, [services]);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
@@ -60,13 +76,22 @@ const ServiceSection = () => {
     "Pediatric Physiotherapy": "bg-pink-50 text-pink-600",
     "Geriatric Physiotherapy": "bg-orange-50 text-orange-600",
     "Dry Needling": "bg-red-50 text-red-600",
-    "Electrotherapy": "bg-sky-50 text-sky-600",
+    Electrotherapy: "bg-sky-50 text-sky-600",
   };
 
   return (
-    <section id="services" className="py-24 bg-[#f8fafc] relative overflow-hidden">
+    <section
+      id="services"
+      className="py-24 bg-[#f8fafc] relative overflow-hidden"
+    >
       {/* Background patterns */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#2e3192 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+      <div
+        className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(#2e3192 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -76,12 +101,15 @@ const ServiceSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">Our Expertise</Badge>
+          <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
+            Our Expertise
+          </Badge>
           <h2 className="text-4xl lg:text-5xl font-extrabold text-[#1a1c3d] mb-6">
             Comprehensive Rehabilitation
           </h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Advanced treatments tailored to your unique needs using evidence-based practice and state-of-the-art technology.
+            Advanced treatments tailored to your unique needs using
+            evidence-based practice and state-of-the-art technology.
           </p>
         </motion.div>
 
@@ -91,7 +119,9 @@ const ServiceSection = () => {
           </div>
         ) : services.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl shadow-sm">
-            <p className="text-gray-500 text-lg">Our services are being updated. Check back soon!</p>
+            <p className="text-gray-500 text-lg">
+              Our services are being updated. Check back soon!
+            </p>
           </div>
         ) : (
           <motion.div
@@ -112,31 +142,50 @@ const ServiceSection = () => {
                   variants={fadeInUp}
                   className="group h-full"
                 >
-                  <div className="h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_-10px_rgba(46,49,146,0.1)] transition-all duration-500 relative flex flex-col group-hover:-translate-y-2">
-                    <div className="flex justify-between items-start mb-8">
-                      <div className={`p-4 rounded-2xl ${colorClasses} transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
-                        <IconComponent className="h-7 w-7" />
+                  <div className="h-full p-8 rounded-[2rem] bg-white border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_-10px_rgba(46,49,146,0.1)] transition-all duration-500 relative flex flex-col group-hover:-translate-y-2 overflow-hidden">
+                    {/* Blurred Background Image */}
+                    {service.imageUrl &&
+                      service.imageUrl.startsWith("http") && (
+                        <div className="absolute inset-0 z-0">
+                          <div
+                            className="absolute inset-0 bg-cover bg-center blur-sm scale-105"
+                            style={{
+                              backgroundImage: `url(${service.imageUrl})`,
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-white/50" />
+                        </div>
+                      )}
+
+                    {/* Content */}
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex justify-between items-start mb-8">
+                        <div
+                          className={`p-4 rounded-2xl ${colorClasses} transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}
+                        >
+                          <IconComponent className="h-7 w-7" />
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <ArrowRight className="h-5 w-5 text-[#2e3192]" />
+                        </div>
                       </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <ArrowRight className="h-5 w-5 text-[#2e3192]" />
-                      </div>
+
+                      <h3 className="text-xl font-bold text-[#1a1c3d] mb-4 group-hover:text-[#2e3192] transition-colors uppercase tracking-tight">
+                        {service.name}
+                      </h3>
+
+                      <p className="text-gray-700 leading-relaxed mb-8 flex-grow">
+                        {service.shortDescription}
+                      </p>
+
+                      <Link
+                        href={`/services#${service._id}`}
+                        className="inline-flex items-center text-sm font-bold text-[#2e3192] group-hover:gap-2 transition-all"
+                      >
+                        LEARN MORE
+                        <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                      </Link>
                     </div>
-
-                    <h3 className="text-xl font-bold text-[#1a1c3d] mb-4 group-hover:text-[#2e3192] transition-colors uppercase tracking-tight">
-                      {service.name}
-                    </h3>
-
-                    <p className="text-gray-500 leading-relaxed mb-8 flex-grow">
-                      {service.shortDescription}
-                    </p>
-
-                    <Link
-                      href={`/services#${service._id}`}
-                      className="inline-flex items-center text-sm font-bold text-[#2e3192] group-hover:gap-2 transition-all"
-                    >
-                      LEARN MORE
-                      <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                    </Link>
 
                     {/* Decorative element on card hover */}
                     <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-blue-50/50 rounded-br-[2rem] -z-10 group-hover:opacity-100 opacity-0 transition-opacity" />
@@ -154,7 +203,11 @@ const ServiceSection = () => {
           className="mt-20 text-center"
         >
           <Link href="/services">
-            <Button variant="outline" size="lg" className="rounded-2xl border-2 border-gray-200 hover:border-[#2e3192] hover:text-[#2e3192] px-10 py-6 font-bold transition-all">
+            <Button
+              variant="outline"
+              size="lg"
+              className="rounded-2xl border-2 border-gray-200 hover:border-[#2e3192] hover:text-[#2e3192] px-10 py-6 font-bold transition-all"
+            >
               View All Specialist Services
             </Button>
           </Link>

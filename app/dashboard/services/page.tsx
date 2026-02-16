@@ -17,6 +17,8 @@ import {
   Tag,
   List,
   AlertTriangle,
+  Image as ImageIcon,
+  Upload,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import ServiceCategoriesList from "./components/ServiceCategoriesList";
@@ -42,7 +44,15 @@ interface ServiceCategory {
 
 interface Service {
   _id: string;
-  category: string | { _id: string; name: string; slug: string; description: string; icon: string };
+  category:
+    | string
+    | {
+        _id: string;
+        name: string;
+        slug: string;
+        description: string;
+        icon: string;
+      };
   name: string;
   slug: string;
   shortDescription: string;
@@ -57,11 +67,14 @@ interface Service {
 export default function ServicesPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"categories" | "services">("categories");
+  const [activeTab, setActiveTab] = useState<"categories" | "services">(
+    "categories",
+  );
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
-  const [editingCategory, setEditingCategory] = useState<ServiceCategory | null>(null);
+  const [editingCategory, setEditingCategory] =
+    useState<ServiceCategory | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [refreshCategoriesTrigger, setRefreshCategoriesTrigger] = useState(0);
   const [services, setServices] = useState<Service[]>([]);
@@ -70,7 +83,9 @@ export default function ServicesPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingService, setDeletingService] = useState<Service | null>(null);
 
-  const [formData, setFormData] = useState<Partial<Omit<Service, 'category'> & { category: string }>>({
+  const [formData, setFormData] = useState<
+    Partial<Omit<Service, "category"> & { category: string }>
+  >({
     category: "",
     name: "",
     slug: "",
@@ -84,6 +99,9 @@ export default function ServicesPage() {
   });
 
   const [benefitInput, setBenefitInput] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
 
   // Fetch services and categories on mount
   useEffect(() => {
@@ -122,7 +140,8 @@ export default function ServicesPage() {
       ? services
       : services.filter((s) => {
           // Handle both populated and non-populated category
-          const categoryId = typeof s.category === 'object' ? s.category._id : s.category;
+          const categoryId =
+            typeof s.category === "object" ? s.category._id : s.category;
           const category = categories.find((c) => c._id === categoryId);
           return category?.name === selectedCategory;
         });
@@ -155,10 +174,38 @@ export default function ServicesPage() {
     e.preventDefault();
 
     const submitToast = toast.loading(
-      editingService ? "Updating service..." : "Creating service..."
+      editingService ? "Updating service..." : "Creating service...",
     );
 
     try {
+      let imageUrl = formData.imageUrl || "";
+      let imagePublicId = "";
+
+      // Upload image if a new file is selected
+      if (imageFile) {
+        setIsUploading(true);
+        const uploadFormData = new FormData();
+        uploadFormData.append("image", imageFile);
+
+        const token = localStorage.getItem("token");
+        const uploadResponse = await fetch("/api/services/upload", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: uploadFormData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const uploadData = await uploadResponse.json();
+        imageUrl = uploadData.imageUrl;
+        imagePublicId = uploadData.publicId;
+        setIsUploading(false);
+      }
+
       const payload: CreateServicePayload = {
         category: formData.category!,
         name: formData.name!,
@@ -168,7 +215,7 @@ export default function ServicesPage() {
         keyBenefits: formData.keyBenefits || [],
         duration: formData.duration!,
         pricing: formData.pricing!,
-        imageUrl: formData.imageUrl,
+        imageUrl: imageUrl,
         published: formData.published ?? true,
       };
 
@@ -187,6 +234,7 @@ export default function ServicesPage() {
       toast.error(error.message || "Failed to submit service", {
         id: submitToast,
       });
+      setIsUploading(false);
     }
   };
 
@@ -204,21 +252,26 @@ export default function ServicesPage() {
       published: true,
     });
     setBenefitInput("");
+    setImageFile(null);
+    setImagePreview("");
     setIsFormOpen(false);
     setEditingService(null);
   };
 
   const handleEdit = (service: any) => {
     // Handle both populated and non-populated category field
-    const categoryId = typeof service.category === 'object' 
-      ? service.category._id 
-      : service.category;
-    
+    const categoryId =
+      typeof service.category === "object"
+        ? service.category._id
+        : service.category;
+
     setEditingService(service);
     setFormData({
       ...service,
       category: categoryId,
     });
+    setImagePreview(service.imageUrl || "");
+    setImageFile(null);
     setIsFormOpen(true);
   };
 
@@ -400,13 +453,16 @@ export default function ServicesPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {filteredServices.map((service, index) => {
                     // Handle both populated and non-populated category
-                    const categoryId = typeof service.category === 'object' 
-                      ? service.category._id 
-                      : service.category;
-                    const categoryName = typeof service.category === 'object'
-                      ? service.category.name
-                      : categories.find((c) => c._id === categoryId)?.name || "Uncategorized";
-                    
+                    const categoryId =
+                      typeof service.category === "object"
+                        ? service.category._id
+                        : service.category;
+                    const categoryName =
+                      typeof service.category === "object"
+                        ? service.category.name
+                        : categories.find((c) => c._id === categoryId)?.name ||
+                          "Uncategorized";
+
                     return (
                       <motion.div
                         key={service._id}
@@ -429,7 +485,9 @@ export default function ServicesPage() {
                                     {categoryName}
                                   </span>
                                 </div>
-                                <h3 className="text-xl font-bold">{service.name}</h3>
+                                <h3 className="text-xl font-bold">
+                                  {service.name}
+                                </h3>
                               </div>
                             </div>
                             <div className="flex gap-2">
@@ -447,11 +505,24 @@ export default function ServicesPage() {
                               </button>
                             </div>
                           </div>
-                          <p className="text-sm opacity-90">{service.shortDescription}</p>
+                          <p className="text-sm opacity-90">
+                            {service.shortDescription}
+                          </p>
                         </div>
 
                         {/* Service Body */}
                         <div className="p-6">
+                          {/* Service Image */}
+                          {service.imageUrl && (
+                            <div className="mb-6 rounded-lg overflow-hidden">
+                              <img
+                                src={service.imageUrl}
+                                alt={service.name}
+                                className="w-full h-48 object-cover"
+                              />
+                            </div>
+                          )}
+
                           {/* Detailed Description */}
                           <div className="mb-6">
                             <h4 className="text-sm font-semibold text-gray-900 mb-2">
@@ -469,7 +540,10 @@ export default function ServicesPage() {
                             </h4>
                             <div className="space-y-2">
                               {service.keyBenefits.map((benefit, idx) => (
-                                <div key={idx} className="flex items-start gap-2">
+                                <div
+                                  key={idx}
+                                  className="flex items-start gap-2"
+                                >
                                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
                                   <span className="text-sm text-gray-700">
                                     {benefit}
@@ -486,7 +560,9 @@ export default function ServicesPage() {
                                 <Clock className="h-5 w-5 text-blue-600" />
                               </div>
                               <div>
-                                <p className="text-xs text-gray-500">Duration</p>
+                                <p className="text-xs text-gray-500">
+                                  Duration
+                                </p>
                                 <p className="text-sm font-semibold text-gray-900">
                                   {service.duration}
                                 </p>
@@ -511,32 +587,32 @@ export default function ServicesPage() {
                 </div>
               )}
 
-          {/* Empty State */}
-          {filteredServices.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <Briefcase className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No services found
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {selectedCategory === "All"
-                  ? "Get started by adding your first service"
-                  : `No services in "${selectedCategory}" category`}
-              </p>
-              {selectedCategory === "All" && (
-                <button
-                  onClick={() => setIsFormOpen(true)}
-                  className="px-6 py-3 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+              {/* Empty State */}
+              {filteredServices.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12"
                 >
-                  Add Your First Service
-                </button>
+                  <Briefcase className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    No services found
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    {selectedCategory === "All"
+                      ? "Get started by adding your first service"
+                      : `No services in "${selectedCategory}" category`}
+                  </p>
+                  {selectedCategory === "All" && (
+                    <button
+                      onClick={() => setIsFormOpen(true)}
+                      className="px-6 py-3 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    >
+                      Add Your First Service
+                    </button>
+                  )}
+                </motion.div>
               )}
-            </motion.div>
-          )}
             </>
           )}
         </main>
@@ -627,7 +703,11 @@ export default function ServicesPage() {
                   </label>
                   <select
                     required
-                    value={typeof formData.category === 'string' ? formData.category : ''}
+                    value={
+                      typeof formData.category === "string"
+                        ? formData.category
+                        : ""
+                    }
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value })
                     }
@@ -668,7 +748,10 @@ export default function ServicesPage() {
                   required
                   value={formData.shortDescription}
                   onChange={(e) =>
-                    setFormData({ ...formData, shortDescription: e.target.value })
+                    setFormData({
+                      ...formData,
+                      shortDescription: e.target.value,
+                    })
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
                   placeholder="Hands-on approach using joint mobilization..."
@@ -741,6 +824,67 @@ export default function ServicesPage() {
                 </div>
               </div>
 
+              {/* Service Image */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Service Image
+                </label>
+                <div className="space-y-3">
+                  {/* Image Preview */}
+                  {imagePreview && (
+                    <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-gray-200">
+                      <img
+                        src={imagePreview}
+                        alt="Service preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview("");
+                          setFormData({ ...formData, imageUrl: "" });
+                        }}
+                        className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Upload Button */}
+                  <div className="flex items-center gap-3">
+                    <label className="flex-1 cursor-pointer">
+                      <div className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-[#2e3192] hover:bg-gray-50 transition-colors">
+                        <Upload className="h-5 w-5 text-gray-600" />
+                        <span className="text-sm font-medium text-gray-700">
+                          {imageFile ? imageFile.name : "Choose an image"}
+                        </span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setImageFile(file);
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setImagePreview(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Supported formats: JPEG, PNG, GIF, WebP (Max 10MB)
+                  </p>
+                </div>
+              </div>
+
               {/* Duration & Pricing */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -781,15 +925,21 @@ export default function ServicesPage() {
                   type="button"
                   onClick={resetForm}
                   className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={isUploading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white rounded-lg hover:shadow-lg transition-all"
+                  disabled={isUploading}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="h-5 w-5" />
-                  {editingService ? "Update Service" : "Add Service"}
+                  {isUploading
+                    ? "Uploading..."
+                    : editingService
+                      ? "Update Service"
+                      : "Add Service"}
                 </button>
               </div>
             </form>

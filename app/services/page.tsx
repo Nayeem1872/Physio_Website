@@ -68,6 +68,19 @@ export default function ServicesPage() {
   const { contactInfo } = useContactInfo();
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
+  // Debug: Log services data
+  console.log("=== SERVICES PAGE DEBUG ===");
+  console.log("Total services:", services.length);
+  console.log("Full services data:", services);
+
+  services.forEach((service, index) => {
+    console.log(`Service ${index + 1}:`, {
+      name: service.name,
+      imageUrl: service.imageUrl,
+      hasImage: !!service.imageUrl,
+    });
+  });
+
   // Icon mapping
   const iconMap: { [key: string]: any } = {
     Activity,
@@ -88,17 +101,19 @@ export default function ServicesPage() {
     "Pediatric Physiotherapy": "from-pink-500 to-pink-600",
     "Geriatric Physiotherapy": "from-orange-500 to-orange-600",
     "Dry Needling": "from-red-500 to-red-600",
-    "Electrotherapy": "from-blue-500 to-blue-600",
+    Electrotherapy: "from-blue-500 to-blue-600",
   };
 
   // Get unique categories
   const categories = useMemo(() => {
     const uniqueCategories = Array.from(
-      new Set(services.map((s) => s.category._id))
-    ).map((id) => {
-      const service = services.find((s) => s.category._id === id);
-      return service?.category;
-    }).filter(Boolean);
+      new Set(services.map((s) => s.category._id)),
+    )
+      .map((id) => {
+        const service = services.find((s) => s.category._id === id);
+        return service?.category;
+      })
+      .filter(Boolean);
 
     return uniqueCategories;
   }, [services]);
@@ -284,7 +299,9 @@ export default function ServicesPage() {
             </div>
           ) : services.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600">No services available at the moment.</p>
+              <p className="text-gray-600">
+                No services available at the moment.
+              </p>
             </div>
           ) : (
             <>
@@ -299,10 +316,11 @@ export default function ServicesPage() {
                 <div className="flex flex-wrap gap-3 justify-center">
                   <button
                     onClick={() => setActiveCategory("all")}
-                    className={`px-6 py-3 rounded-xl font-medium transition-all ${activeCategory === "all"
+                    className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                      activeCategory === "all"
                         ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
                         : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-                      }`}
+                    }`}
                   >
                     All Services
                   </button>
@@ -312,10 +330,11 @@ export default function ServicesPage() {
                       <button
                         key={category._id}
                         onClick={() => setActiveCategory(category._id)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeCategory === category._id
+                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                          activeCategory === category._id
                             ? "bg-gradient-to-r from-[#2e3192] to-[#4c46a3] text-white shadow-lg"
                             : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-                          }`}
+                        }`}
                       >
                         <IconComponent className="h-5 w-5" />
                         {category.name}
@@ -334,9 +353,11 @@ export default function ServicesPage() {
                 className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
               >
                 {filteredServices.map((service) => {
-                  const IconComponent = iconMap[service.category.icon] || Activity;
+                  const IconComponent =
+                    iconMap[service.category.icon] || Activity;
                   const colorClass =
-                    colorMap[service.category.name] || "from-[#2e3192] to-[#4c46a3]";
+                    colorMap[service.category.name] ||
+                    "from-[#2e3192] to-[#4c46a3]";
 
                   return (
                     <motion.div
@@ -344,60 +365,79 @@ export default function ServicesPage() {
                       variants={fadeInUp}
                       className="h-full"
                     >
-                      <Card className="h-full flex flex-col border-gray-200/80 shadow-md hover:shadow-xl hover:border-[#2e3192] transition-all duration-300 group">
-                        <CardHeader className="items-center text-center pb-4">
-                          <div
-                            className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${colorClass} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform duration-300`}
-                          >
-                            <IconComponent className="h-8 w-8" />
-                          </div>
-                          <CardTitle className="text-xl font-bold text-gray-800">
-                            {service.name}
-                          </CardTitle>
-                          <CardDescription className="text-gray-500 pt-1">
-                            {service.shortDescription}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col flex-grow space-y-4">
-                          <p className="text-sm text-gray-600 leading-relaxed flex-grow">
-                            {service.detailedDescription}
-                          </p>
-
-                          <div className="space-y-2 pt-2">
-                            <h4 className="font-semibold text-gray-800 text-sm">
-                              Key Benefits:
-                            </h4>
-                            <ul className="space-y-1.5">
-                              {service.keyBenefits.map((benefit, i) => (
-                                <li
-                                  key={i}
-                                  className="flex items-center space-x-2 text-sm text-gray-700"
-                                >
-                                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                                  <span>{benefit}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="border-t pt-4 mt-auto">
-                            <div className="flex justify-between items-center text-sm mb-4">
-                              <div className="flex items-center space-x-2 text-gray-600">
-                                <Clock className="h-4 w-4 text-[#2e3192]" />
-                                <span className="font-medium">{service.duration}</span>
-                              </div>
-                              <div className="text-lg font-bold text-[#2e3192]">
-                                {service.pricing}
-                              </div>
+                      <Card className="h-full flex flex-col border-gray-200/80 shadow-md hover:shadow-xl hover:border-[#2e3192] transition-all duration-300 group relative overflow-hidden">
+                        {/* Background Image at Top */}
+                        {service.imageUrl &&
+                          service.imageUrl.startsWith("http") && (
+                            <div className="relative h-48 w-full overflow-hidden">
+                              <div
+                                className="absolute inset-0 bg-cover bg-center"
+                                style={{
+                                  backgroundImage: `url(${service.imageUrl})`,
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/90" />
                             </div>
-                            <Link href="/book" className="w-full">
-                              <Button className="w-full bg-[#2e3192] hover:bg-[#252a7a]">
-                                Book This Service
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                              </Button>
-                            </Link>
-                          </div>
-                        </CardContent>
+                          )}
+
+                        {/* Content */}
+                        <div className="relative z-10 flex flex-col flex-grow">
+                          <CardHeader className="items-center text-center pb-4">
+                            <div
+                              className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${colorClass} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform duration-300`}
+                            >
+                              <IconComponent className="h-8 w-8" />
+                            </div>
+                            <CardTitle className="text-xl font-bold text-gray-800">
+                              {service.name}
+                            </CardTitle>
+                            <CardDescription className="text-gray-500 pt-1">
+                              {service.shortDescription}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="flex flex-col flex-grow space-y-4">
+                            <p className="text-sm text-gray-600 leading-relaxed flex-grow">
+                              {service.detailedDescription}
+                            </p>
+
+                            <div className="space-y-2 pt-2">
+                              <h4 className="font-semibold text-gray-800 text-sm">
+                                Key Benefits:
+                              </h4>
+                              <ul className="space-y-1.5">
+                                {service.keyBenefits.map((benefit, i) => (
+                                  <li
+                                    key={i}
+                                    className="flex items-center space-x-2 text-sm text-gray-700"
+                                  >
+                                    <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                                    <span>{benefit}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div className="border-t pt-4 mt-auto">
+                              <div className="flex justify-between items-center text-sm mb-4">
+                                <div className="flex items-center space-x-2 text-gray-600">
+                                  <Clock className="h-4 w-4 text-[#2e3192]" />
+                                  <span className="font-medium">
+                                    {service.duration}
+                                  </span>
+                                </div>
+                                <div className="text-lg font-bold text-[#2e3192]">
+                                  {service.pricing}
+                                </div>
+                              </div>
+                              <Link href="/book" className="w-full">
+                                <Button className="w-full bg-[#2e3192] hover:bg-[#252a7a]">
+                                  Book This Service
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                              </Link>
+                            </div>
+                          </CardContent>
+                        </div>
                       </Card>
                     </motion.div>
                   );
@@ -499,7 +539,9 @@ export default function ServicesPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">FAQ</Badge>
+            <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
+              FAQ
+            </Badge>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
               Frequently Asked Questions
             </h2>
