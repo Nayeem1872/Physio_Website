@@ -104,7 +104,7 @@ const ServiceSection = () => {
           <Badge className="bg-[#2e3192] text-white hover:bg-[#1a1c3d] mb-4 py-1.5 px-6 rounded-full text-sm font-semibold tracking-wide shadow-lg shadow-blue-900/10">
             Our Expertise
           </Badge>
-          <h2 className="text-4xl lg:text-5xl font-extrabold text-[#1a1c3d] mb-6">
+          <h2 className="text-4xl font-bold text-[#1a1c3d] mb-6">
             Comprehensive Rehabilitation
           </h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">

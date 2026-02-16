@@ -55,16 +55,20 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <motion.div whileHover={{ scale: 1.05 }}>
-              <Link href="/" className="flex items-center space-x-3">
-                <img
-                  src="/images/logo4.png"
-                  alt="Reflex Physiotherapy Logo"
-                  className="w-12 h-12 object-cover rounded-full"
-                />
+              <Link href="/" className="flex items-center space-x-3 group">
+                <div className="relative">
+                  <img
+                    src="/images/logo-circle.png"
+                    alt="Reflex Physiotherapy Logo"
+                    className="w-14 h-14 object-cover rounded-full border-2 border-[#2e3192]/10 shadow-sm transition-all group-hover:border-[#2e3192]/30"
+                  />
+                </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-800">Reflex</h1>
-                  <p className="text-xs text-gray-600">
-                    Physiotherapy & Rehab Center
+                  <h1 className="text-2xl font-bold text-[#1a1c3d] tracking-tight">
+                    Reflex
+                  </h1>
+                  <p className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-medium leading-none mt-1">
+                    Physiotherapy & Rehab
                   </p>
                 </div>
               </Link>

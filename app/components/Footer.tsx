@@ -36,18 +36,20 @@ const Footer = () => {
           >
             <div className="space-y-4">
               <motion.div
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-3 group"
                 whileHover={{ scale: 1.05 }}
               >
                 <img
-                  src="/images/logo4.png"
+                  src="/images/logo-circle.png"
                   alt="Reflex Physiotherapy Logo"
-                  className="w-12 h-12 object-cover rounded-md"
+                  className="w-14 h-14 object-cover rounded-full border border-gray-700"
                 />
                 <div>
-                  <h3 className="text-xl font-bold">Reflex</h3>
-                  <p className="text-sm text-gray-400">
-                    Physiotherapy & Rehab Center
+                  <h3 className="text-xl font-bold text-white tracking-tight">
+                    Reflex
+                  </h3>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">
+                    Physiotherapy & Rehab
                   </p>
                 </div>
               </motion.div>
@@ -55,7 +57,7 @@ const Footer = () => {
                 Your trusted partner in recovery and rehabilitation. Helping you
                 move better and live healthier.
               </p>
-              
+
               {/* Social Media Links */}
               {socialLinks.length > 0 && (
                 <div className="flex items-center gap-3 pt-2">
@@ -141,7 +143,7 @@ const Footer = () => {
                     ))}
                   </div>
                 )}
-                
+
                 {contactInfo?.email && contactInfo.email.length > 0 && (
                   <div className="space-y-2">
                     {contactInfo.email.map((email, index) => (
@@ -157,7 +159,7 @@ const Footer = () => {
                     ))}
                   </div>
                 )}
-                
+
                 {contactInfo?.address && contactInfo.address.length > 0 && (
                   <div className="space-y-2">
                     {contactInfo.address.map((addr, index) => (
