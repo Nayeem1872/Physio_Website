@@ -78,7 +78,7 @@ interface Leadership {
 }
 
 export default function ReflexPhysiotherapyWebsite() {
-  const [heroBanner, setHeroBanner] = useState<Banner | null>(null);
+  const [heroBanners, setHeroBanners] = useState<Banner[]>([]);
   const [aboutBanner, setAboutBanner] = useState<Banner | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
@@ -122,7 +122,7 @@ export default function ReflexPhysiotherapyWebsite() {
         // Process banners
         if (bannersData.status === 'fulfilled') {
           const banners: Banner[] = bannersData.value.banners || [];
-          setHeroBanner(banners.find((b) => b.section === "hero") || null);
+          setHeroBanners(banners.filter((b) => b.section === "hero"));
           setAboutBanner(banners.find((b) => b.section === "about") || null);
         }
 
@@ -169,7 +169,7 @@ export default function ReflexPhysiotherapyWebsite() {
 
       {/* Hero Section */}
       <HeroSection
-        banner={heroBanner}
+        banners={heroBanners}
         isLoading={isLoading}
         contactInfo={contactInfo}
       />

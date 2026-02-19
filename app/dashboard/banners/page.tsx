@@ -34,6 +34,7 @@ export default function BannersManagementPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [existingImagesList, setExistingImagesList] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     section: "hero",
@@ -55,10 +56,19 @@ export default function BannersManagementPage() {
       const response = await fetch(`${BACKEND_URL}/api/banners`);
       if (response.ok) {
         const data = await response.json();
-        setBanners(data);
+        // Handle API response format { count: number, banners: Banner[] }
+        if (data && Array.isArray(data.banners)) {
+          setBanners(data.banners);
+        } else if (Array.isArray(data)) {
+          setBanners(data);
+        } else {
+          console.error("Unexpected banner data format:", data);
+          setBanners([]);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch banners:", error);
+      setBanners([]);
     }
   };
 
@@ -107,6 +117,10 @@ export default function BannersManagementPage() {
       formDataToSend.append("title", formData.title);
       formDataToSend.append("subtitle", formData.subtitle);
       formDataToSend.append("isActive", formData.isActive.toString());
+
+      if (editingBanner) {
+        formDataToSend.append("existingImages", JSON.stringify(existingImagesList));
+      }
 
       // Append multiple images
       selectedFiles.forEach((file) => {
@@ -158,6 +172,7 @@ export default function BannersManagementPage() {
       subtitle: banner.subtitle,
       isActive: banner.isActive,
     });
+    setExistingImagesList(banner.images || []);
     setShowForm(true);
   };
 
@@ -218,12 +233,27 @@ export default function BannersManagementPage() {
     setShowForm(false);
     setEditingBanner(null);
     setSelectedFiles([]);
+    setExistingImagesList([]);
     setFormData({
       section: "hero",
       title: "",
       subtitle: "",
       isActive: true,
     });
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImagesList(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return "";
+    if (imagePath.startsWith("http") || imagePath.startsWith("data:")) {
+      return imagePath;
+    }
+    const baseUrl = BACKEND_URL || "";
+    if (!baseUrl) return imagePath;
+    return `${baseUrl}${imagePath}`;
   };
 
   const heroBanners = banners.filter((b) => b.section === "hero");
@@ -397,10 +427,40 @@ export default function BannersManagementPage() {
                       />
                     </div>
 
+                    {/* Current Images (Edit Mode) */}
+                    {editingBanner && existingImagesList.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Current Images ({existingImagesList.length})
+                        </label>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl">
+                          {existingImagesList.map((img, idx) => (
+                            <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 group">
+                              <img
+                                src={getImageUrl(img)}
+                                alt={`Current ${idx}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Image+Not+Found';
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeExistingImage(idx)}
+                                className="absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Images Upload */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Images {!editingBanner && "*"}
+                        {editingBanner ? "Add New Images" : "Images *"}
                       </label>
                       <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-[#2e3192] transition-colors">
                         <input
@@ -408,7 +468,7 @@ export default function BannersManagementPage() {
                           multiple
                           accept="image/*"
                           onChange={handleFileChange}
-                          required={!editingBanner}
+                          required={!editingBanner && existingImagesList.length === 0}
                           className="hidden"
                           id="image-upload"
                         />
@@ -428,13 +488,16 @@ export default function BannersManagementPage() {
                       {selectedFiles.length > 0 && (
                         <div className="mt-3">
                           <p className="text-sm font-medium text-gray-700 mb-2">
-                            Selected files: {selectedFiles.length}
+                            New files to upload: {selectedFiles.length}
                           </p>
-                          <div className="space-y-1">
+                          <div className="flex flex-wrap gap-2">
                             {selectedFiles.map((file, index) => (
-                              <p key={index} className="text-xs text-gray-600">
-                                {file.name}
-                              </p>
+                              <div key={index} className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs">
+                                <span className="truncate max-w-[150px]">{file.name}</span>
+                                <button type="button" onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== index))}>
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -568,13 +631,26 @@ function BannerCard({
   onToggleActive: (banner: Banner) => void;
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
+
+  // Reset error state when image changes
+  useEffect(() => {
+    setImageError(false);
+  }, [currentImageIndex, banner.images]);
 
   // Prepend base URL to image paths
   const getImageUrl = (imagePath: string) => {
-    if (imagePath.startsWith("http")) {
+    if (!imagePath) return "";
+    if (imagePath.startsWith("http") || imagePath.startsWith("data:")) {
       return imagePath;
     }
-    return `${BACKEND_URL}${imagePath}`;
+    // Remove leading slash if BACKEND_URL follows standard of having no traling slash
+    // But ensure we don't end up with double slashes if BACKEND_URL is empty
+    const baseUrl = BACKEND_URL || "";
+    // If baseUrl is empty, we just need the path (which should start with / for public folder)
+    if (!baseUrl) return imagePath;
+
+    return `${baseUrl}${imagePath}`;
   };
 
   const nextImage = () => {
@@ -604,18 +680,29 @@ function BannerCard({
       <div className="relative h-48 overflow-hidden bg-gray-100 group">
         {banner.images && banner.images.length > 0 ? (
           <>
-            <img
-              src={getImageUrl(banner.images[currentImageIndex])}
-              alt={banner.title}
-              className="w-full h-full object-cover transition-opacity duration-300"
-            />
+            {!imageError ? (
+              <img
+                src={getImageUrl(banner.images[currentImageIndex])}
+                alt={banner.title}
+                onError={() => setImageError(true)}
+                className="w-full h-full object-cover transition-opacity duration-300"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+                <ImageIcon className="h-10 w-10 mb-2 opacity-50" />
+                <span className="text-xs">Image not found</span>
+              </div>
+            )}
 
             {/* Carousel Controls */}
             {banner.images.length > 1 && (
               <>
                 <button
-                  onClick={prevImage}
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevImage();
+                  }}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 >
                   <svg
                     className="w-4 h-4"
@@ -632,8 +719,11 @@ function BannerCard({
                   </svg>
                 </button>
                 <button
-                  onClick={nextImage}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextImage();
+                  }}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 >
                   <svg
                     className="w-4 h-4"
@@ -651,22 +741,24 @@ function BannerCard({
                 </button>
 
                 {/* Image Indicators */}
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1 z-10">
                   {banner.images.map((_, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setCurrentImageIndex(idx)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        idx === currentImageIndex
-                          ? "bg-white w-4"
-                          : "bg-white/50"
-                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(idx);
+                      }}
+                      className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex
+                        ? "bg-white w-4"
+                        : "bg-white/50"
+                        }`}
                     />
                   ))}
                 </div>
 
                 {/* Image Counter */}
-                <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-medium">
+                <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-medium z-10">
                   {currentImageIndex + 1} / {banner.images.length}
                 </div>
               </>
@@ -678,13 +770,12 @@ function BannerCard({
           </div>
         )}
 
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-4 left-4 z-10">
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${
-              banner.isActive
-                ? "bg-green-500 text-white"
-                : "bg-gray-500 text-white"
-            }`}
+            className={`px-3 py-1 rounded-full text-xs font-medium ${banner.isActive
+              ? "bg-green-500 text-white"
+              : "bg-gray-500 text-white"
+              }`}
           >
             {banner.isActive ? "Active" : "Inactive"}
           </span>
