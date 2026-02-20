@@ -21,6 +21,20 @@ export async function POST(request: NextRequest) {
         await connectDB();
 
         const body = await request.json();
+
+        // Handle mapping from simplified forms (like the Hero section)
+        if (body.name && !body.firstName) {
+            const parts = body.name.trim().split(/\s+/);
+            body.firstName = parts[0];
+            if (parts.length > 1 && !body.lastName) {
+                body.lastName = parts.slice(1).join(' ');
+            }
+        }
+
+        if (body.date && !body.preferredDate) {
+            body.preferredDate = body.date;
+        }
+
         const appointment = new Appointment(body);
         await appointment.save();
         return Response.json({ message: 'Appointment created successfully', appointment }, { status: 201 });

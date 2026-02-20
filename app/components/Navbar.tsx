@@ -58,9 +58,9 @@ const Navbar = () => {
               <Link href="/" className="flex items-center space-x-3 group">
                 <div className="relative">
                   <img
-                    src="/images/logo-circle.png"
+                    src="/images/logo2.jpg"
                     alt="Reflex Physiotherapy Logo"
-                    className="w-14 h-14 object-cover rounded-full border-2 border-[#2e3192]/10 shadow-sm transition-all group-hover:border-[#2e3192]/30"
+                    className="w-14 h-14 object-contain transition-all"
                   />
                 </div>
                 <div>

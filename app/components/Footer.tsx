@@ -40,9 +40,9 @@ const Footer = () => {
                 whileHover={{ scale: 1.05 }}
               >
                 <img
-                  src="/images/logo-circle.png"
+                  src="/images/logo2.jpg"
                   alt="Reflex Physiotherapy Logo"
-                  className="w-14 h-14 object-cover rounded-full border border-gray-700"
+                  className="w-14 h-14 object-contain"
                 />
                 <div>
                   <h3 className="text-xl font-bold text-white tracking-tight">

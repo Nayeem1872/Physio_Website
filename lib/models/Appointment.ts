@@ -1,27 +1,27 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IAppointment extends Document {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
-  dateOfBirth: Date;
+  dateOfBirth?: Date;
   service: string;
-  preferredDate: Date;
-  preferredTime: string;
-  appointmentType: 'in-person' | 'online' | 'home-visit';
+  preferredDate?: Date;
+  preferredTime?: string;
+  appointmentType?: 'in-person' | 'online' | 'home-visit';
   urgency: 'normal' | 'urgent' | 'emergency';
   previousTreatment: boolean;
   insuranceProvider?: string;
   referralSource?: string;
-  symptoms: string;
+  symptoms?: string;
   medicalHistory?: string;
   currentMedications?: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
-  emergencyContactRelation: string;
-  agreeToTerms: boolean;
-  agreeToPrivacy: boolean;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelation?: string;
+  agreeToTerms?: boolean;
+  agreeToPrivacy?: boolean;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   createdAt: Date;
   updatedAt: Date;
@@ -31,12 +31,10 @@ const appointmentSchema = new Schema<IAppointment>(
   {
     firstName: {
       type: String,
-      required: [true, 'First name is required'],
       trim: true
     },
     lastName: {
       type: String,
-      required: [true, 'Last name is required'],
       trim: true
     },
     email: {
@@ -52,8 +50,7 @@ const appointmentSchema = new Schema<IAppointment>(
       trim: true
     },
     dateOfBirth: {
-      type: Date,
-      required: [true, 'Date of birth is required']
+      type: Date
     },
     service: {
       type: String,
@@ -61,18 +58,16 @@ const appointmentSchema = new Schema<IAppointment>(
       trim: true
     },
     preferredDate: {
-      type: Date,
-      required: [true, 'Preferred date is required']
+      type: Date
     },
     preferredTime: {
       type: String,
-      required: [true, 'Preferred time is required'],
       trim: true
     },
     appointmentType: {
       type: String,
       enum: ['in-person', 'online', 'home-visit'],
-      required: [true, 'Appointment type is required']
+      default: 'in-person'
     },
     urgency: {
       type: String,
@@ -93,7 +88,6 @@ const appointmentSchema = new Schema<IAppointment>(
     },
     symptoms: {
       type: String,
-      required: [true, 'Symptoms are required'],
       trim: true
     },
     medicalHistory: {
@@ -106,38 +100,23 @@ const appointmentSchema = new Schema<IAppointment>(
     },
     emergencyContactName: {
       type: String,
-      required: [true, 'Emergency contact name is required'],
       trim: true
     },
     emergencyContactPhone: {
       type: String,
-      required: [true, 'Emergency contact phone is required'],
       trim: true
     },
     emergencyContactRelation: {
       type: String,
-      required: [true, 'Emergency contact relation is required'],
       trim: true
     },
     agreeToTerms: {
       type: Boolean,
-      required: [true, 'You must agree to terms'],
-      validate: {
-        validator: function (v: boolean) {
-          return v === true;
-        },
-        message: 'You must agree to terms and conditions'
-      }
+      default: true
     },
     agreeToPrivacy: {
       type: Boolean,
-      required: [true, 'You must agree to privacy policy'],
-      validate: {
-        validator: function (v: boolean) {
-          return v === true;
-        },
-        message: 'You must agree to privacy policy'
-      }
+      default: true
     },
     status: {
       type: String,
@@ -150,6 +129,9 @@ const appointmentSchema = new Schema<IAppointment>(
   }
 );
 
-const Appointment = mongoose.models.Appointment || mongoose.model<IAppointment>('Appointment', appointmentSchema);
+if (mongoose.models.Appointment) {
+  delete mongoose.models.Appointment;
+}
+const Appointment = mongoose.model<IAppointment>('Appointment', appointmentSchema);
 
 export default Appointment;

@@ -1,12 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Heart, Star, Users, PhoneCall, Sparkles } from "lucide-react";
+import { CheckCircle, Heart, Star, Users, Phone, Mail, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { BACKEND_URL } from "@/lib/config";
+import toast from "react-hot-toast";
 
 interface Banner {
   _id: string;
@@ -38,6 +39,52 @@ interface HeroSectionProps {
 
 const HeroSection = ({ banners, isLoading, contactInfo }: HeroSectionProps) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    date: ""
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    if (!formData.name || !formData.email || !formData.phone || !formData.date) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          service: "Physiotherapy Analysis",
+          status: "pending"
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment request sent!");
+        setFormData({ name: "", email: "", phone: "", date: "" });
+      } else {
+        toast.error("Failed to send request. Please try again.");
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      toast.error("An error occurred. Please check your connection.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Flatten banners so each image becomes its own slide with its parent banner's text
   const slides = useMemo(() => {
@@ -72,17 +119,35 @@ const HeroSection = ({ banners, isLoading, contactInfo }: HeroSectionProps) => {
   };
 
   useEffect(() => {
-    if (slides.length <= 1) return;
+    if (slides.length <= 1 || isLoading) return;
 
     const interval = setInterval(() => {
       setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, [slides.length, isLoading]);
 
   const currentSlide = slides[currentSlideIndex];
-  const slideImage = currentSlide.image;
+  const slideImage = currentSlide?.image;
+
+  if (isLoading) {
+    return (
+      <div className="relative min-h-[90vh] lg:min-h-[85vh] bg-[#f8faff] flex flex-col items-center justify-center overflow-hidden">
+        {/* Decorative background for loader */}
+        <div className="absolute top-0 right-0 w-[50%] h-full bg-[#2e3192]/5 -skew-x-12 translate-x-1/4 -z-10" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-100/30 rounded-full blur-[100px] -z-10" />
+
+        <div className="relative flex flex-col items-center gap-6">
+          <div className="w-20 h-20 border-4 border-[#2e3192]/10 border-t-[#2e3192] rounded-full animate-spin" />
+          <div className="flex flex-col items-center">
+            <h3 className="text-2xl font-black text-[#1a1c3d] animate-pulse">Reflex Physiotherapy</h3>
+            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Loading Premium Experience...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-[90vh] lg:min-h-[85vh] bg-[#f8faff] overflow-hidden flex flex-col justify-center">
@@ -131,31 +196,28 @@ const HeroSection = ({ banners, isLoading, contactInfo }: HeroSectionProps) => {
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
-                  <Link href="#contact">
-                    <Button
-                      variant="outline"
-                      className="rounded-2xl border-2 border-[#2e3192]/20 text-[#2e3192] hover:bg-[#2e3192]/5 px-10 py-7 text-lg font-bold transition-all hover:translate-y-[-4px]"
-                    >
-                      Book Visit
-                    </Button>
-                  </Link>
+                  {contactInfo?.phone?.[0] ? (
+                    <a href={`tel:${contactInfo.phone[0]}`}>
+                      <Button
+                        variant="outline"
+                        className="rounded-2xl border-2 border-[#2e3192]/20 text-[#2e3192] hover:bg-[#2e3192]/5 px-10 py-7 text-lg font-bold transition-all hover:translate-y-[-4px] flex items-center gap-3"
+                      >
+                        <Phone className="w-5 h-5" />
+                        {contactInfo.phone[0]}
+                      </Button>
+                    </a>
+                  ) : (
+                    <Link href="#contact">
+                      <Button
+                        variant="outline"
+                        className="rounded-2xl border-2 border-[#2e3192]/20 text-[#2e3192] hover:bg-[#2e3192]/5 px-10 py-7 text-lg font-bold transition-all hover:translate-y-[-4px]"
+                      >
+                        Book Visit
+                      </Button>
+                    </Link>
+                  )}
                 </div>
 
-                <div className="mt-16 flex items-center gap-6 border-t border-gray-200/60 pt-8">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-gray-200 overflow-hidden shadow-lg">
-                        <img src={`https://i.pravatar.cc/100?img=${i + 15}`} alt="User" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex text-amber-400">
-                      {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3.5 h-3.5 fill-current" />)}
-                    </div>
-                    <p className="text-xs text-[#1a1c3d] font-black uppercase tracking-widest mt-1">10k+ Successful Treatments</p>
-                  </div>
-                </div>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -165,24 +227,33 @@ const HeroSection = ({ banners, isLoading, contactInfo }: HeroSectionProps) => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlideIndex}
-                initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 1.1, rotate: -2 }}
-                transition={{ duration: 1, ease: "anticipate" }}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                 className="relative z-10 w-full aspect-video group"
               >
                 {/* Image Container with Dynamic Border */}
-                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm p-2 rounded-3xl shadow-[0_50px_100px_-20px_rgba(46,49,146,0.15)] ring-1 ring-black/5">
-                  <div className="w-full h-full rounded-2xl overflow-hidden relative bg-gray-50/50">
-                    <img
+                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm p-1.5 rounded-3xl shadow-[0_50px_100px_-20px_rgba(46,49,146,0.15)] ring-1 ring-black/5">
+                  <div className="w-full h-full rounded-2xl overflow-hidden relative shadow-inner">
+                    <motion.img
+                      key={slideImage}
+                      initial={{ scale: 1.15, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{
+                        scale: { duration: 12, ease: "linear" },
+                        opacity: { duration: 0.8, ease: "easeOut" }
+                      }}
                       src={getImageUrl(slideImage)}
                       alt={currentSlide.title}
-                      className="w-full h-full object-contain transition-transform duration-[2000ms] group-hover:scale-105"
+                      className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "/images/pic2.jpg";
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#2e3192]/20 via-transparent to-transparent" />
+                    {/* Cinematic Overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c3d]/20 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none" />
                   </div>
                 </div>
 
@@ -198,7 +269,7 @@ const HeroSection = ({ banners, isLoading, contactInfo }: HeroSectionProps) => {
                   </div>
                   <div>
                     <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">Patient Trust</p>
-                    <p className="text-2xl font-black text-[#1a1c3d]">99.9%</p>
+                    <p className="text-2xl font-black text-[#1a1c3d]">100%</p>
                   </div>
                 </motion.div>
 
@@ -234,29 +305,66 @@ const HeroSection = ({ banners, isLoading, contactInfo }: HeroSectionProps) => {
           transition={{ delay: 1, duration: 0.8 }}
           className="mt-24 relative z-30 lg:-mb-16"
         >
-          <div className="bg-white/80 backdrop-blur-2xl rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-white/50 p-8 lg:p-10 max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+          <div className="bg-white/80 backdrop-blur-2xl rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-white/50 p-8 lg:p-10 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-[#2e3192] uppercase tracking-widest ml-1">Full Name</label>
                 <div className="relative">
                   <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input type="text" placeholder="John Doe" className="w-full bg-gray-50/50 border-2 border-transparent focus:border-[#2e3192]/10 rounded-2xl pl-12 pr-5 py-4 transition-all outline-none" />
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="John Doe"
+                    className="w-full bg-gray-50/50 border-2 border-transparent focus:border-[#2e3192]/10 rounded-2xl pl-12 pr-5 py-4 transition-all outline-none"
+                  />
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-[#2e3192] uppercase tracking-widest ml-1">Service</label>
-                <select className="w-full bg-gray-50/50 border-2 border-transparent focus:border-[#2e3192]/10 rounded-2xl px-5 py-4 transition-all outline-none appearance-none cursor-pointer">
-                  <option>Physiotherapy</option>
-                  <option>Rehabilitation</option>
-                  <option>Pain Management</option>
-                </select>
+                <label className="text-[10px] font-black text-[#2e3192] uppercase tracking-widest ml-1">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="john@example.com"
+                    className="w-full bg-gray-50/50 border-2 border-transparent focus:border-[#2e3192]/10 rounded-2xl pl-12 pr-5 py-4 transition-all outline-none"
+                  />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-[#2e3192] uppercase tracking-widest ml-1">Phone Number</label>
+                <div className="relative">
+                  <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="+1 (555) 000-0000"
+                    className="w-full bg-gray-50/50 border-2 border-transparent focus:border-[#2e3192]/10 rounded-2xl pl-12 pr-5 py-4 transition-all outline-none"
+                  />
+                </div>
               </div>
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-[#2e3192] uppercase tracking-widest ml-1">Preferred Date</label>
-                <input type="date" className="w-full bg-gray-50/50 border-2 border-transparent focus:border-[#2e3192]/10 rounded-2xl px-5 py-4 transition-all outline-none cursor-pointer" />
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleInputChange}
+                  className="w-full bg-gray-50/50 border-2 border-transparent focus:border-[#2e3192]/10 rounded-2xl px-5 py-4 transition-all outline-none cursor-pointer"
+                />
               </div>
-              <Button className="w-full bg-[#2e3192] hover:bg-[#1a1c3d] text-white rounded-2xl py-8 shadow-xl shadow-[#2e3192]/20 font-bold text-lg active:scale-95 transition-all">
-                Book Analysis
+              <Button
+                onClick={() => handleSubmit()}
+                disabled={isSubmitting}
+                className="w-full bg-[#2e3192] hover:bg-[#1a1c3d] text-white rounded-2xl py-8 shadow-xl shadow-[#2e3192]/20 font-bold text-lg active:scale-95 transition-all disabled:opacity-70"
+              >
+                {isSubmitting ? "Sending..." : "Book Analysis"}
               </Button>
             </div>
           </div>
