@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -77,7 +80,7 @@ export default function ContactInfoPage() {
 
     try {
       setIsSaving(true);
-      
+
       // Filter out empty strings from arrays
       const payload: ContactInfoPayload = {
         phone: formData.phone.filter((p) => p.trim() !== ""),
@@ -113,7 +116,7 @@ export default function ContactInfoPage() {
 
   const removeField = (
     field: "phone" | "email" | "address" | "whatsapp",
-    index: number
+    index: number,
   ) => {
     setFormData({
       ...formData,
@@ -124,7 +127,7 @@ export default function ContactInfoPage() {
   const updateField = (
     field: "phone" | "email" | "address" | "whatsapp",
     index: number,
-    value: string
+    value: string,
   ) => {
     const newArray = [...formData[field]];
     newArray[index] = value;
@@ -137,7 +140,7 @@ export default function ContactInfoPage() {
   return (
     <div className="flex h-screen bg-gray-50">
       <Toaster position="top-right" />
-      
+
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <DashboardSidebar
@@ -387,7 +390,10 @@ export default function ContactInfoPage() {
                           type="url"
                           value={formData.facebook}
                           onChange={(e) =>
-                            setFormData({ ...formData, facebook: e.target.value })
+                            setFormData({
+                              ...formData,
+                              facebook: e.target.value,
+                            })
                           }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
                           placeholder="https://facebook.com/yourpage"
@@ -404,7 +410,10 @@ export default function ContactInfoPage() {
                           type="url"
                           value={formData.instagram}
                           onChange={(e) =>
-                            setFormData({ ...formData, instagram: e.target.value })
+                            setFormData({
+                              ...formData,
+                              instagram: e.target.value,
+                            })
                           }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
                           placeholder="https://instagram.com/yourprofile"
@@ -421,7 +430,10 @@ export default function ContactInfoPage() {
                           type="url"
                           value={formData.twitter}
                           onChange={(e) =>
-                            setFormData({ ...formData, twitter: e.target.value })
+                            setFormData({
+                              ...formData,
+                              twitter: e.target.value,
+                            })
                           }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
                           placeholder="https://twitter.com/yourhandle"
@@ -438,7 +450,10 @@ export default function ContactInfoPage() {
                           type="url"
                           value={formData.linkedin}
                           onChange={(e) =>
-                            setFormData({ ...formData, linkedin: e.target.value })
+                            setFormData({
+                              ...formData,
+                              linkedin: e.target.value,
+                            })
                           }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
                           placeholder="https://linkedin.com/company/yourcompany"
@@ -455,7 +470,10 @@ export default function ContactInfoPage() {
                           type="url"
                           value={formData.youtube}
                           onChange={(e) =>
-                            setFormData({ ...formData, youtube: e.target.value })
+                            setFormData({
+                              ...formData,
+                              youtube: e.target.value,
+                            })
                           }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2e3192] focus:border-transparent"
                           placeholder="https://youtube.com/@yourchannel"

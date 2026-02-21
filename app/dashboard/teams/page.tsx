@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -50,7 +53,7 @@ export default function TeamsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [editingLeadership, setEditingLeadership] = useState<Leadership | null>(
-    null
+    null,
   );
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 

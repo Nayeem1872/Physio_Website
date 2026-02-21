@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -75,7 +78,7 @@ export default function BannersManagementPage() {
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -101,12 +104,12 @@ export default function BannersManagementPage() {
     try {
       // Check if banner already exists for this section
       const existingBanner = banners.find(
-        (b) => b.section === formData.section && b._id !== editingBanner?._id
+        (b) => b.section === formData.section && b._id !== editingBanner?._id,
       );
 
       if (existingBanner && !editingBanner) {
         setErrorMessage(
-          `A ${formData.section} banner already exists. Please edit or delete the existing one.`
+          `A ${formData.section} banner already exists. Please edit or delete the existing one.`,
         );
         setIsLoading(false);
         return;
@@ -119,7 +122,10 @@ export default function BannersManagementPage() {
       formDataToSend.append("isActive", formData.isActive.toString());
 
       if (editingBanner) {
-        formDataToSend.append("existingImages", JSON.stringify(existingImagesList));
+        formDataToSend.append(
+          "existingImages",
+          JSON.stringify(existingImagesList),
+        );
       }
 
       // Append multiple images
@@ -148,7 +154,7 @@ export default function BannersManagementPage() {
         setSuccessMessage(
           editingBanner
             ? "Banner updated successfully!"
-            : "Banner created successfully!"
+            : "Banner created successfully!",
         );
         fetchBanners();
         handleCancel();
@@ -243,7 +249,7 @@ export default function BannersManagementPage() {
   };
 
   const removeExistingImage = (index: number) => {
-    setExistingImagesList(prev => prev.filter((_, i) => i !== index));
+    setExistingImagesList((prev) => prev.filter((_, i) => i !== index));
   };
 
   const getImageUrl = (imagePath: string) => {
@@ -435,13 +441,17 @@ export default function BannersManagementPage() {
                         </label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl">
                           {existingImagesList.map((img, idx) => (
-                            <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 group">
+                            <div
+                              key={idx}
+                              className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 group"
+                            >
                               <img
                                 src={getImageUrl(img)}
                                 alt={`Current ${idx}`}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                  (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Image+Not+Found';
+                                  (e.target as HTMLImageElement).src =
+                                    "https://placehold.co/600x400?text=Image+Not+Found";
                                 }}
                               />
                               <button
@@ -468,7 +478,9 @@ export default function BannersManagementPage() {
                           multiple
                           accept="image/*"
                           onChange={handleFileChange}
-                          required={!editingBanner && existingImagesList.length === 0}
+                          required={
+                            !editingBanner && existingImagesList.length === 0
+                          }
                           className="hidden"
                           id="image-upload"
                         />
@@ -492,9 +504,21 @@ export default function BannersManagementPage() {
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {selectedFiles.map((file, index) => (
-                              <div key={index} className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs">
-                                <span className="truncate max-w-[150px]">{file.name}</span>
-                                <button type="button" onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== index))}>
+                              <div
+                                key={index}
+                                className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs"
+                              >
+                                <span className="truncate max-w-[150px]">
+                                  {file.name}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedFiles((prev) =>
+                                      prev.filter((_, i) => i !== index),
+                                    )
+                                  }
+                                >
                                   <X className="h-3 w-3" />
                                 </button>
                               </div>
@@ -656,7 +680,7 @@ function BannerCard({
   const nextImage = () => {
     if (banner.images && banner.images.length > 0) {
       setCurrentImageIndex((prev) =>
-        prev === banner.images.length - 1 ? 0 : prev + 1
+        prev === banner.images.length - 1 ? 0 : prev + 1,
       );
     }
   };
@@ -664,7 +688,7 @@ function BannerCard({
   const prevImage = () => {
     if (banner.images && banner.images.length > 0) {
       setCurrentImageIndex((prev) =>
-        prev === 0 ? banner.images.length - 1 : prev - 1
+        prev === 0 ? banner.images.length - 1 : prev - 1,
       );
     }
   };
@@ -749,10 +773,11 @@ function BannerCard({
                         e.stopPropagation();
                         setCurrentImageIndex(idx);
                       }}
-                      className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex
-                        ? "bg-white w-4"
-                        : "bg-white/50"
-                        }`}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        idx === currentImageIndex
+                          ? "bg-white w-4"
+                          : "bg-white/50"
+                      }`}
                     />
                   ))}
                 </div>
@@ -772,10 +797,11 @@ function BannerCard({
 
         <div className="absolute top-4 left-4 z-10">
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${banner.isActive
-              ? "bg-green-500 text-white"
-              : "bg-gray-500 text-white"
-              }`}
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              banner.isActive
+                ? "bg-green-500 text-white"
+                : "bg-gray-500 text-white"
+            }`}
           >
             {banner.isActive ? "Active" : "Inactive"}
           </span>

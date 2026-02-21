@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -24,7 +27,9 @@ export default function FAQPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
-  const [filterStatus, setFilterStatus] = useState<"all" | "published" | "unpublished">("all");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "published" | "unpublished"
+  >("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [stats, setStats] = useState({
@@ -113,9 +118,7 @@ export default function FAQPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 FAQ Management
               </h1>
-              <p className="text-gray-600">
-                Manage frequently asked questions
-              </p>
+              <p className="text-gray-600">Manage frequently asked questions</p>
             </div>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -139,7 +142,9 @@ export default function FAQPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.total}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
                   <HelpCircle className="h-6 w-6 text-blue-600" />
@@ -156,7 +161,9 @@ export default function FAQPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Published</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.published}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.published}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
                   <CheckCircle className="h-6 w-6 text-green-600" />
@@ -173,7 +180,9 @@ export default function FAQPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Pending</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.unpublished}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.unpublished}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
                   <Clock className="h-6 w-6 text-orange-600" />
@@ -190,7 +199,9 @@ export default function FAQPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Categories</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.categories.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.categories.length}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
                   <List className="h-6 w-6 text-purple-600" />
@@ -243,7 +254,9 @@ export default function FAQPage() {
             {/* Category Filter */}
             {stats.categories.length > 0 && (
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium text-gray-700">Category:</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Category:
+                </span>
                 <button
                   onClick={() => setCategoryFilter("all")}
                   className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${

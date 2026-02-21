@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -228,7 +230,7 @@ export default function TeamPage() {
               {teamMembers.map((member, index) => {
                 const IconComponent =
                   iconMap[
-                  Object.keys(iconMap)[index % Object.keys(iconMap).length]
+                    Object.keys(iconMap)[index % Object.keys(iconMap).length]
                   ] || Hand;
 
                 return (

@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -46,12 +49,12 @@ export default function BlogPage() {
 
         // Fetch categories
         const categoriesResponse = await fetch(
-          `${BACKEND_URL}/api/blog-categories`
+          `${BACKEND_URL}/api/blog-categories`,
         );
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json();
           const categoryNames = categoriesData.categories.map(
-            (cat: Category) => cat.name
+            (cat: Category) => cat.name,
           );
           setCategories(["All", ...categoryNames]);
         }

@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
@@ -40,7 +43,11 @@ export default function TestimonialsPage() {
           const data = await response.json();
           const allTestimonials = data.testimonials || [];
           // Filter out testimonials that are intended for the video gallery
-          setTestimonials(allTestimonials.filter((t: Testimonial) => t.bannerMediaType !== "video"));
+          setTestimonials(
+            allTestimonials.filter(
+              (t: Testimonial) => t.bannerMediaType !== "video",
+            ),
+          );
         }
       } catch (error) {
         console.error("Failed to fetch testimonials:", error);
@@ -145,7 +152,6 @@ export default function TestimonialsPage() {
         </div>
       </section>
 
-
       {/* Filter Section */}
       <section className="py-8 px-4">
         <div className="container mx-auto">
@@ -245,7 +251,7 @@ export default function TestimonialsPage() {
                                 <div
                                   onClick={() =>
                                     handleVideoClick(
-                                      getMediaUrl(testimonial.bannerMedia!)
+                                      getMediaUrl(testimonial.bannerMedia!),
                                     )
                                   }
                                   className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"

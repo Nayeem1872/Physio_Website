@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -36,7 +39,7 @@ export default function MilestonesPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(
-    null
+    null,
   );
   const [filterStatus, setFilterStatus] = useState<
     "all" | "published" | "unpublished"
@@ -64,7 +67,7 @@ export default function MilestonesPage() {
         const data = await response.json();
         const milestones = data.milestones || [];
         const published = milestones.filter(
-          (m: Milestone) => m.published
+          (m: Milestone) => m.published,
         ).length;
         setStats({
           total: milestones.length,

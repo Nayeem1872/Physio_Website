@@ -1,29 +1,44 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState, useMemo, useCallback } from "react";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import { motion } from "framer-motion";
 import { BACKEND_URL } from "@/lib/config";
 
 // Lazy load components that are not immediately visible
-const ServiceSection = dynamic(() => import("./components/ServiceSection"), {
+const ServiceSection = dynamicImport(
+  () => import("./components/ServiceSection"),
+  {
+    loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
+  },
+);
+const AboutSection = dynamicImport(() => import("./components/AboutSection"), {
   loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
 });
-const AboutSection = dynamic(() => import("./components/AboutSection"), {
+const TeamSection = dynamicImport(() => import("./components/TeamSection"), {
   loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
 });
-const TeamSection = dynamic(() => import("./components/TeamSection"), {
-  loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
-});
-const TestimonialSection = dynamic(() => import("./components/TestimonialSection"), {
-  loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
-});
-const ContactSection = dynamic(() => import("./components/ContactSection"), {
-  loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
-});
-const VideoGallerySection = dynamic(() => import("./components/VideoGallerySection"), {
-  loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
-});
-const Footer = dynamic(() => import("./components/Footer"));
+const TestimonialSection = dynamicImport(
+  () => import("./components/TestimonialSection"),
+  {
+    loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
+  },
+);
+const ContactSection = dynamicImport(
+  () => import("./components/ContactSection"),
+  {
+    loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
+  },
+);
+const VideoGallerySection = dynamicImport(
+  () => import("./components/VideoGallerySection"),
+  {
+    loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
+  },
+);
+const Footer = dynamicImport(() => import("./components/Footer"));
 
 // Keep critical above-the-fold components as regular imports
 import Navbar from "./components/Navbar";
@@ -86,62 +101,71 @@ export default function ReflexPhysiotherapyWebsite() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Memoize API endpoints
-  const apiEndpoints = useMemo(() => ({
-    banners: `${BACKEND_URL}/api/banners?isActive=true`,
-    testimonials: `${BACKEND_URL}/api/testimonials`,
-    contact: `${BACKEND_URL}/api/contact-info`,
-    leadership: `${BACKEND_URL}/api/leadership`,
-  }), []);
+  const apiEndpoints = useMemo(
+    () => ({
+      banners: `${BACKEND_URL}/api/banners?isActive=true`,
+      testimonials: `${BACKEND_URL}/api/testimonials`,
+      contact: `${BACKEND_URL}/api/contact-info`,
+      leadership: `${BACKEND_URL}/api/leadership`,
+    }),
+    [],
+  );
 
   // Optimized fetch function with error handling
-  const fetchWithRetry = useCallback(async (url: string, retries = 2): Promise<any> => {
-    for (let i = 0; i <= retries; i++) {
-      try {
-        const response = await fetch(url, {
-          next: { revalidate: 3600 }, // Cache for 1 hour
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return await response.json();
-      } catch (error) {
-        if (i === retries) throw error;
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+  const fetchWithRetry = useCallback(
+    async (url: string, retries = 2): Promise<any> => {
+      for (let i = 0; i <= retries; i++) {
+        try {
+          const response = await fetch(url, {
+            next: { revalidate: 3600 }, // Cache for 1 hour
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return await response.json();
+        } catch (error) {
+          if (i === retries) throw error;
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+        }
       }
-    }
-  }, []);
+    },
+    [],
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch all data in parallel for better performance
-        const [bannersData, testimonialsData, contactData, leadershipData] = await Promise.allSettled([
-          fetchWithRetry(apiEndpoints.banners),
-          fetchWithRetry(apiEndpoints.testimonials),
-          fetchWithRetry(apiEndpoints.contact),
-          fetchWithRetry(apiEndpoints.leadership),
-        ]);
+        const [bannersData, testimonialsData, contactData, leadershipData] =
+          await Promise.allSettled([
+            fetchWithRetry(apiEndpoints.banners),
+            fetchWithRetry(apiEndpoints.testimonials),
+            fetchWithRetry(apiEndpoints.contact),
+            fetchWithRetry(apiEndpoints.leadership),
+          ]);
         // Process banners
-        if (bannersData.status === 'fulfilled') {
+        if (bannersData.status === "fulfilled") {
           const banners: Banner[] = bannersData.value.banners || [];
           setHeroBanners(banners.filter((b) => b.section === "hero"));
           setAboutBanner(banners.find((b) => b.section === "about") || null);
         }
 
         // Process testimonials
-        if (testimonialsData.status === 'fulfilled') {
+        if (testimonialsData.status === "fulfilled") {
           setTestimonials(testimonialsData.value.testimonials || []);
         }
 
         // Process contact info
-        if (contactData.status === 'fulfilled') {
+        if (contactData.status === "fulfilled") {
           setContactInfo(contactData.value);
         }
 
         // Process leadership
-        if (leadershipData.status === 'fulfilled') {
+        if (leadershipData.status === "fulfilled") {
           const data = leadershipData.value;
           if (data.leaders?.length > 0) {
             const sortedLeadership = data.leaders
-              .filter((l: Leadership) => l.role === "chairman" || l.role === "ceo")
+              .filter(
+                (l: Leadership) => l.role === "chairman" || l.role === "ceo",
+              )
               .sort((a: Leadership, b: Leadership) => a.order - b.order);
             setLeadership(sortedLeadership);
           }
@@ -157,10 +181,13 @@ export default function ReflexPhysiotherapyWebsite() {
   }, [apiEndpoints, fetchWithRetry]);
 
   // Memoize leadership data
-  const { chairman, ceo } = useMemo(() => ({
-    chairman: leadership.find((l) => l.role === "chairman"),
-    ceo: leadership.find((l) => l.role === "ceo"),
-  }), [leadership]);
+  const { chairman, ceo } = useMemo(
+    () => ({
+      chairman: leadership.find((l) => l.role === "chairman"),
+      ceo: leadership.find((l) => l.role === "ceo"),
+    }),
+    [leadership],
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -204,8 +231,6 @@ export default function ReflexPhysiotherapyWebsite() {
 
       {/* Testimonials Section */}
       <TestimonialSection testimonials={testimonials} isLoading={isLoading} />
-
-
 
       {/* Contact Section */}
       <ContactSection />

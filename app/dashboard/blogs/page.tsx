@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -52,11 +55,11 @@ export default function BlogsManagementPage() {
   const [showForm, setShowForm] = useState(false);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
-  const [editingCategory, setEditingCategory] = useState<BlogCategory | null>(null);
+  const [editingCategory, setEditingCategory] = useState<BlogCategory | null>(
+    null,
+  );
   const [refreshCategoriesTrigger, setRefreshCategoriesTrigger] = useState(0);
   const [refreshBlogsTrigger, setRefreshBlogsTrigger] = useState(0);
-
-
 
   // Calculate blog counts per category (will be updated when we fetch from API)
   const blogCounts = {} as { [key: string]: number };

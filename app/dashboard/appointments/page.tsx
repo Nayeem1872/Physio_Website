@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -24,11 +27,14 @@ export default function AppointmentsPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<
+    Appointment[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  
+
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("all");
@@ -77,7 +83,7 @@ export default function AppointmentsPage() {
           apt.lastName.toLowerCase().includes(query) ||
           apt.email.toLowerCase().includes(query) ||
           apt.phone.includes(query) ||
-          apt.service.toLowerCase().includes(query)
+          apt.service.toLowerCase().includes(query),
       );
     }
 
@@ -165,7 +171,7 @@ export default function AppointmentsPage() {
   return (
     <div className="flex h-screen bg-gray-50">
       <Toaster position="top-right" />
-      
+
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <DashboardSidebar
@@ -221,7 +227,9 @@ export default function AppointmentsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stats.total}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Calendar className="h-6 w-6 text-blue-600" />
@@ -238,7 +246,9 @@ export default function AppointmentsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Pending</p>
-                  <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
+                  <p className="text-3xl font-bold text-yellow-600">
+                    {stats.pending}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                   <Clock className="h-6 w-6 text-yellow-600" />
@@ -255,7 +265,9 @@ export default function AppointmentsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Confirmed</p>
-                  <p className="text-3xl font-bold text-blue-600">{stats.confirmed}</p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {stats.confirmed}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <CheckCircle className="h-6 w-6 text-blue-600" />
@@ -272,7 +284,9 @@ export default function AppointmentsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Completed</p>
-                  <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
+                  <p className="text-3xl font-bold text-green-600">
+                    {stats.completed}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <CheckCircle className="h-6 w-6 text-green-600" />
@@ -370,7 +384,9 @@ export default function AppointmentsPage() {
                     No appointments found
                   </h3>
                   <p className="text-gray-600">
-                    {searchQuery || statusFilter !== "all" || urgencyFilter !== "all"
+                    {searchQuery ||
+                    statusFilter !== "all" ||
+                    urgencyFilter !== "all"
                       ? "Try adjusting your filters"
                       : "No appointments have been booked yet"}
                   </p>
@@ -437,7 +453,9 @@ export default function AppointmentsPage() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900 flex items-center gap-1">
                               <Calendar className="h-4 w-4 text-gray-400" />
-                              {new Date(appointment.preferredDate).toLocaleDateString()}
+                              {new Date(
+                                appointment.preferredDate,
+                              ).toLocaleDateString()}
                             </div>
                             <div className="text-sm text-gray-500 flex items-center gap-1">
                               <Clock className="h-4 w-4 text-gray-400" />
@@ -445,7 +463,9 @@ export default function AppointmentsPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {getAppointmentTypeBadge(appointment.appointmentType)}
+                            {getAppointmentTypeBadge(
+                              appointment.appointmentType,
+                            )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {getUrgencyBadge(appointment.urgency)}

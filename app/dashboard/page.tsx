@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "./components/DashboardSidebar";
@@ -31,10 +34,7 @@ import {
   Line,
 } from "recharts";
 import toast, { Toaster } from "react-hot-toast";
-import {
-  getDashboardStatsAPI,
-  DashboardStats,
-} from "./api/dashboardApi";
+import { getDashboardStatsAPI, DashboardStats } from "./api/dashboardApi";
 import { getUserInfoAPI, User } from "./api/authApi";
 
 export default function DashboardPage() {
@@ -47,7 +47,7 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchDashboardData();
     fetchUserInfo();
-    
+
     // Show welcome toast if just logged in
     const justLoggedIn = sessionStorage.getItem("justLoggedIn");
     if (justLoggedIn === "true") {
@@ -144,16 +144,34 @@ export default function DashboardPage() {
   // Prepare chart data
   const appointmentStatusData = stats
     ? [
-        { name: "Pending", value: stats.appointments.pending, color: "#FCD34D" },
-        { name: "Confirmed", value: stats.appointments.confirmed, color: "#60A5FA" },
-        { name: "Completed", value: stats.appointments.completed, color: "#34D399" },
-        { name: "Cancelled", value: stats.appointments.cancelled, color: "#F87171" },
+        {
+          name: "Pending",
+          value: stats.appointments.pending,
+          color: "#FCD34D",
+        },
+        {
+          name: "Confirmed",
+          value: stats.appointments.confirmed,
+          color: "#60A5FA",
+        },
+        {
+          name: "Completed",
+          value: stats.appointments.completed,
+          color: "#34D399",
+        },
+        {
+          name: "Cancelled",
+          value: stats.appointments.cancelled,
+          color: "#F87171",
+        },
       ].filter((item) => item.value > 0)
     : [];
 
   const appointmentTypeData = stats
     ? stats.appointments.byType.map((type) => ({
-        name: type._id.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+        name: type._id
+          .replace("-", " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase()),
         value: type.count,
       }))
     : [];
@@ -237,7 +255,9 @@ export default function DashboardPage() {
             className="mb-8"
           >
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {user ? `Welcome back, ${user.name.split(" ")[0]}!` : "Dashboard Overview"}
+              {user
+                ? `Welcome back, ${user.name.split(" ")[0]}!`
+                : "Dashboard Overview"}
             </h1>
             <p className="text-gray-600">
               {user
@@ -273,7 +293,9 @@ export default function DashboardPage() {
                           <Icon className="h-6 w-6 text-white" />
                         </div>
                       </div>
-                      <h3 className="text-gray-600 text-sm mb-1">{stat.title}</h3>
+                      <h3 className="text-gray-600 text-sm mb-1">
+                        {stat.title}
+                      </h3>
                       <p className="text-3xl font-bold text-gray-900 mb-1">
                         {stat.value}
                       </p>
@@ -348,7 +370,9 @@ export default function DashboardPage() {
                           {appointmentTypeData.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={["#2e3192", "#60A5FA", "#34D399"][index % 3]}
+                              fill={
+                                ["#2e3192", "#60A5FA", "#34D399"][index % 3]
+                              }
                             />
                           ))}
                         </Pie>
@@ -376,8 +400,16 @@ export default function DashboardPage() {
                       <Tooltip />
                       <Legend />
                       <Bar dataKey="total" fill="#2e3192" name="Total" />
-                      <Bar dataKey="published" fill="#34D399" name="Published" />
-                      <Bar dataKey="unpublished" fill="#F87171" name="Unpublished" />
+                      <Bar
+                        dataKey="published"
+                        fill="#34D399"
+                        name="Published"
+                      />
+                      <Bar
+                        dataKey="unpublished"
+                        fill="#F87171"
+                        name="Unpublished"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </motion.div>
@@ -399,7 +431,11 @@ export default function DashboardPage() {
                         <XAxis dataKey="date" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="count" fill="#2e3192" name="Appointments" />
+                        <Bar
+                          dataKey="count"
+                          fill="#2e3192"
+                          name="Appointments"
+                        />
                       </BarChart>
                     </ResponsiveContainer>
                   </motion.div>
@@ -458,7 +494,8 @@ export default function DashboardPage() {
                                     {appointment.lastName.charAt(0)}
                                   </div>
                                   <span className="text-sm font-medium text-gray-900">
-                                    {appointment.firstName} {appointment.lastName}
+                                    {appointment.firstName}{" "}
+                                    {appointment.lastName}
                                   </span>
                                 </div>
                               </td>
@@ -467,7 +504,7 @@ export default function DashboardPage() {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                 {new Date(
-                                  appointment.preferredDate
+                                  appointment.preferredDate,
                                 ).toLocaleDateString()}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
